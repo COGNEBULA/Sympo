@@ -27,8 +27,11 @@ import {
   Cpu,
   Zap
 } from "lucide-react";
+import { useParams } from "react-router-dom";
 
-const Eventlanding = ({ eventType, setEventType }) => {
+const Eventlanding = () => {
+  const { category, name } = useParams();
+  const eventType = { category, name };
   const event = eventsData?.[eventType.category]?.[eventType.name];
 
   if (!event) return <p>Event not found</p>;

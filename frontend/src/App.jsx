@@ -1,44 +1,55 @@
 import React, { useEffect, useRef, useState } from "react";
-import Navbar from "./components/Navbar/Navbar";
-import ParticlesBackground from "./components/Particle/Particle";
-import Hero from "./components/Hero/Hero.jsx";
-import Highlight from "./components/Highlight/Highlight.jsx";
-import Event from "./components/Event/Event.jsx";
-import Contact from "./components/Contact/Contact.jsx";
-import Eventland from "./components/Event/Eventlanding.jsx";
 import Footer from "./components/Footer/Footer.jsx";
 import Sponsor from "./components/Sponsor/sponsor.jsx";
 import Top_bar from "./components/Navbar/Top_bar.jsx";
 import BackgroundVideo from "./components/Background/Background.jsx";
 import HeroSection from "./components/Hero/hero-section.jsx";
+import { Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar/Navbar";
+import ParticlesBackground from "./components/Particle/Particle";
+import Hero from "./components/Hero/Hero";
+import Highlight from "./components/Highlight/Highlight";
+import Event from "./components/Event/Event";
+import Contact from "./components/Contact/Contact";
+import Eventland from "./components/Event/Eventlanding";
+import Registration from "./components/Register/Register";
 
 const App = () => {
-  const [eventType, setEventType] = useState(null);
-
   return (
     <>
       {/* <ParticlesBackground /> */}
       {/* <BackgroundVideo /> */}
 
-      <div className="relative z-10 flex flex-col">
-        {eventType ? (
-          <Eventland eventType={eventType} setEventType={setEventType} />
-        ) : (
-          <>
-            <Navbar />
-            {/* <Top_bar/> */}
-            {/* <Hero /> */}
-            <HeroSection />
-            <Event setEventType={setEventType} />
-            
-            {/* Section to pause at */}
-            <Highlight id="scroll-focus" />
+      <div className="relative z-10">
+        <Routes>
 
-            <Contact />
-            <Sponsor />
-            <Footer />
-          </>
-        )}
+          {/* 🏠 HOME PAGE */}
+          <Route
+            path="/"
+            element={
+              <>
+                <Navbar />
+                {/* <Hero /> */}
+                <HeroSection />
+                <Event />
+                <Highlight />
+                <Contact />
+              </>
+            }
+          />
+
+          {/* 🎯 EVENT LANDING PAGE */}
+          <Route
+            path="/event/:category/:name"
+            element={<Eventland />}
+          />
+            <Route
+            path="/register"
+            element={<Registration />}
+          />
+
+        </Routes>
       </div>
     </>
   );
