@@ -26,8 +26,8 @@ const App = () => {
         ) : (
           <>
             <Navbar />
-            <Top_bar/>
-            <Hero />
+            {/* <Top_bar/> */}
+            {/* <Hero /> */}
             <HeroSection />
             <Event setEventType={setEventType} />
             
