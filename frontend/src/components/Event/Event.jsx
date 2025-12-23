@@ -3,6 +3,11 @@ import styles from "./event.module.css";
 import cap from "../../assets/cap.png";
 import iron from "../../assets/iron.png";
 import spydi from "../../assets/spydi.png";
+import { useNavigate } from "react-router-dom";
+import Techimg from "../../Assets/eventimg/tech.png";
+import Nontechimg from "../../Assets/eventimg/nontech.png";
+import Workshopimg from "../../Assets/eventimg/workshop.png";
+
 
 const data = [
   {
@@ -19,6 +24,7 @@ const data = [
     color: "neonred",
     type: "tech",
     icon: iron,
+    img : Techimg,
   },
   {
     date: "28 DEC 2025",
@@ -34,6 +40,7 @@ const data = [
     color: "neonblue",
     type: "nontech",
     icon: cap,
+    img : Nontechimg,
   },
     {
     date: "Comming soon..",
@@ -43,14 +50,16 @@ const data = [
     color: "neonred",
     type: "workshop",
     icon: spydi,
+    img: Workshopimg,
   }
 ];
 
-export default function Event({ setEventType }) {
+export default function Event() {
 
   const wrapRef = useRef(null);
   const [expandedCard, setExpandedCard] = useState(null);
-  const [expandedEvent, setExpandedEvent] = useState(null);
+  const [eventType, setEventType] = useState(null);
+  const navigate = useNavigate();
 
   // Toggle card expansion
   const toggleCard = (index) => {
@@ -130,59 +139,62 @@ export default function Event({ setEventType }) {
               </div>
 
               {/* card */}
-              <article 
-                className={`${styles.card} ${expandedCard === i ? styles.cardExpanded : ''}`} 
-                tabIndex={0}
-                onClick={() => toggleCard(i)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    toggleCard(i);
-                  }
-                }}
-                role="button"
-                aria-expanded={expandedCard === i}
-              >
-                <span className={`${styles.badge} ${styles[item.color]}`}>
-                  {item.date}
-                </span>
+<article 
+  className={`${styles.card} ${expandedCard === i ? styles.cardExpanded : ''} ${styles.cardGlow}`} 
+  tabIndex={0}
+  onClick={() => toggleCard(i)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleCard(i);
+    }
+  }}
+  role="button"
+  aria-expanded={expandedCard === i}
+  aria-label={`${expandedCard === i ? 'Collapse' : 'Expand'} ${item.title}`}
+  data-expanded={expandedCard === i}
+>
+  {/* Gradient background overlay */}
+  <div className={styles.cardGradient}></div>
+  
+  {/* Glow effect */}
+  <div className={styles.cardGlowEffect}></div>
+  
+  {/* Date badge with improved styling */}
+  <span className={`${styles.badge} ${styles[item.color]} ${styles.badgeGlow}`}>
+    <span className={styles.badgeText}>{item.date}</span>
+    <span className={styles.badgeDeco}></span>
+  </span>
+  
+  {/* Image with overlay effect */}
+  <div className={styles.imageContainer}>
+    <img
+      src={item.img}
+      alt={item.title || "event image"}
+      className={styles.cardimg}
+      loading="lazy"
+    />
+    <div className={styles.imageOverlay}></div>
+    <div className={styles.imageShine}></div>
+  </div>
+  
+  {/* Content */}
+  <div className={styles.cardContent}>
+    <h3 className={styles.cardTitle}>
+      <span className={styles.titleText}>{item.title}</span>
+      <span className={styles.titleUnderline}></span>
+    </h3>
+    
+    <div className={styles.cardDescWrapper}>
+      <p className={styles.cardDesc}>{item.desc}</p>
 
-                <h3 className={styles.cardTitle}>{item.title}</h3>
-                <p className={styles.cardDesc}>{item.desc}</p>
+    </div>
+    
+  </div>
+  
+</article>
 
-                {/* expand/collapse indicator */}
-                {/* <div className={styles.expandIndicator}>
-                  {expandedCard === i ? '▼' : '▶'} {expandedCard === i ? 'Hide Events' : 'View Events'}
-                </div> */}
-
-                {/* clickable event list - visible when card is expanded */}
-                {expandedCard === i && (
-                  <div className={styles.eventListContainer}>
-                    <ul className={styles.eventList}>
-                      {item.events.map((ev, idx) => (
-                  <li
-                    key={idx}
-                    className={styles.eventItem}
-                    onClick={() =>
-                      setEventType({
-                        category: item.type,
-                        name: ev.name
-                      })
-                    }
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className={styles.eventHeader}>
-                      <span className={styles.eventName}>{ev.name}</span>
-                    </div>
-                  </li>
-
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </article>
-
-              {/* connector + diamond marker */}
+              
             </div>
           );
         })}
