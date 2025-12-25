@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import Prize from "../Prize/prize";
+
 
 const Eventlanding = () => {
   const { category, id } = useParams();
@@ -184,36 +186,10 @@ const navigate = useNavigate();
               {/* Detailed Information */}
               <div className={styles.detailsSection}>
                 <h2>
-                  <BookOpen size={20} />
-                  Event Details
+                  <Trophy size={20} />
+                  Event Price
                 </h2>
-                {event.detailedAgenda && (
-                  <div className={styles.detailBlock}>
-                    <h3>Agenda</h3>
-                    <ul>
-                      {event.detailedAgenda.map((item, i) => (
-                        <li key={i}>
-                          <ChevronRight size={16} />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {event.learningObjectives && (
-                  <div className={styles.detailBlock}>
-                    <h3>Learning Objectives</h3>
-                    <ul>
-                      {event.learningObjectives.map((item, i) => (
-                        <li key={i}>
-                          <Target size={16} />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+               <Prize />
               </div>
             </div>
 
@@ -363,11 +339,11 @@ const navigate = useNavigate();
                   </a>
                 )}
 <button
-  onClick={() => navigate(-1)}
+  onClick={() => navigate("/register")}
   className={styles.secondaryButton}
 >
   <ArrowLeft size={18} />
-  Back to Events
+  Register Now
 </button>
 
               </div>
