@@ -20,8 +20,10 @@
 /* Thanos */
 .thanos {
   position: absolute;
-  bottom: 40px;
-  right: 40px;
+  bottom: 80px;
+  right: 20px;
   width: 300px;
   z-index: 55;
+  margin-bottom: 12vh;
+  margin: -12vh;
 }

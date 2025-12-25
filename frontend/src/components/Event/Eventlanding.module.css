@@ -185,7 +185,7 @@
 }
 
 .eventHeader h1 {
-  font-size: 36px;
+  font-size: 49px;
   margin: 0 0 12px 0;
   color: var(--text-white);
   font-weight: 800;
@@ -240,14 +240,45 @@
   background: var(--glass-bg);
   border-radius: 12px;
   border: 1px solid var(--glass-border);
-  transition: all 0.3s ease;
+
+  /* FLOAT */
+  animation: infoFloat 6s ease-in-out infinite;
+  will-change: transform;
+
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
+/* Hover boost */
 .infoItem:hover {
   background: rgba(127, 0, 255, 0.05);
   border-color: var(--accent-purple);
-  transform: translateY(-2px);
+
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(127, 0, 255, 0.25);
 }
+@keyframes infoFloat {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.infoItem:nth-child(odd) {
+  animation-delay: 0s;
+}
+
+.infoItem:nth-child(even) {
+  animation-delay: 1.5s;
+}
+
 
 .infoIcon {
   display: flex;
@@ -281,9 +312,9 @@
 }
 
 /* Details Section */
-.detailsSection {
+/* .detailsSection {
   margin-top: 8px;
-}
+} */
 
 .detailsSection h2 {
   display: flex;
