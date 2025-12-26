@@ -15,16 +15,20 @@ import Prize from "./components/Prize/prize.jsx";
 import CategoryPage from "./components/Event/CategoryPage";
 
 
-const App = () => {
+const App = () => { 
   return (
     <>
-      <div className="relative z-10">
+      {/* <ParticlesBackground /> */}
+      {/* <BackgroundVideo /> */}
+
+      <div className="relative z-10   ">
         <Routes>
           <Route
             path="/"
             element={
               <>
                 <Navbar />
+             
                 {/* <Hero /> */}
                 <HeroSection />
                 <Event />
