@@ -26,7 +26,7 @@ const people = [
 
 export default function ContactTeam() {
   return (
-    <section className={styles.page} aria-label="Contact section">
+    <section className={styles.page} aria-label="Contact section" id='contact'>
       <div className={styles.headerWrap}>
         <h2 className={styles.title}>Contact</h2>
         <p className={styles.subtitle}>Reach out to our coordinators for any inquiries</p>
@@ -38,6 +38,7 @@ export default function ContactTeam() {
             key={idx}
             className={`${styles.card} ${p.side === 'left' ? styles.left : styles.right}`}
           >
+            <div className={styles.ambientGlow} />
             <div className={styles.peek} aria-hidden>
               <img src={p.img} alt={`${p.name} illustration`} />
             </div>

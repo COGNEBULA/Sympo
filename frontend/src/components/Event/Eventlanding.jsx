@@ -68,13 +68,13 @@ const navigate = useNavigate();
           
           {/* Header with back button */}
           <div className={styles.header}>
-<button
-  onClick={() => navigate(-1)}
-  className={styles.backButton}
->
-  <ArrowLeft size={20} />
-  <span>Back to Events</span>
-</button>
+            <button
+              onClick={() => navigate(-1)}
+              className={styles.backButton}
+            >
+              <ArrowLeft size={20} />
+              <span>Back to Events</span>
+            </button>
 
             <div className={styles.eventCategory}>
               {getCategoryIcon()}
@@ -334,17 +334,15 @@ const navigate = useNavigate();
                     rel="noopener noreferrer"
                     className={styles.registerButton}
                   >
-                    <ExternalLink size={18} />
                     Register Now
                   </a>
                 )}
-<button
-  onClick={() => navigate("/register")}
-  className={styles.secondaryButton}
->
-  <ArrowLeft size={18} />
-  Register Now
-</button>
+                  <button
+                    onClick={() => navigate("/register")}
+                    className={styles.secondaryButton}
+                  >
+                    Register Now
+                  </button>
 
               </div>
             </div>

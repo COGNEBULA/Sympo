@@ -2,9 +2,20 @@
 /* Google-fonts or other font imports should be in your global CSS or head */
 
 /* ---------------- MAIN VARIABLES ---------------- */
-:root{
-  --glass-bg: rgba(255,255,255,0.12);
-  --glass-border: rgba(255,255,255,0.08);
+:root {
+  --accent-primary: #CEA2FD;
+  --accent-secondary: #8968CD;
+  --accent-tertiary: #663399;
+
+  --text-primary: #EAE6FF;
+  --text-secondary: #B6B5D8;
+
+  --glass-bg: rgba(255,255,255,0.10);
+  --glass-border: rgba(206,162,253,0.28);
+
+  --glow-primary: rgba(206,162,253,0.45);
+  --glow-secondary: rgba(137,104,205,0.35);
+
   --bubble-size-desktop: 240px;
   --bubble-size-tablet: 180px;
   --bubble-size-mobile: 140px;
@@ -14,17 +25,17 @@
 /* ---------------- MAIN WRAPPER ---------------- */
 .wrapper {
   position: relative;
-  height: 80vh;
+  /* min-height: 70vh; */
   width: 100%;
-  overflow: hidden;
+  /* overflow: hidden; */
+
   display: flex;
   align-items: center;
   justify-content: center;
-  /* optional bg: */
-  background: radial-gradient(circle at top left, #0b1026 0%, #000 60%);
-  color: #fff;
+
+  background: transparent;
+  color: var(--text-primary);
   padding: 20px;
-  box-sizing: border-box;
 }
 
 /* ---------------- BUBBLE CONTAINER (DESKTOP ROW) ---------------- */
@@ -53,10 +64,9 @@
   height: var(--bubble-size-desktop);
   border-radius: 50%;
 
-  background: rgba(255, 255, 255, 0.12);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
 
   display: flex;
   flex-direction: column;
@@ -65,7 +75,17 @@
   text-align: center;
   padding: 12px;
   box-sizing: border-box;
-
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.6),
+    0 0 40px var(--glow-secondary),
+    inset 0 1px 1px rgba(255,255,255,0.25);
+  background:
+  radial-gradient(
+    circle at top left,
+    rgba(206,162,253,0.22),
+    rgba(255,255,255,0.04) 60%
+    );
+    
   /* floating / zigzag variables */
   --dir: 1;              /* overridden inline by React style --dir */
   --i: 0;                /* overridden inline by React style --i */
@@ -88,41 +108,59 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  filter: blur(6px);
-  pointer-events: none;
-  z-index: 1;
+  background: radial-gradient(
+    circle,
+    rgba(255,255,255,0.6),
+    transparent 70%
+  );
+  filter: blur(10px);
+  opacity: 0.7;
 }
 
 /* trophy / image */
 .prizeBubble img {
   position: absolute;
-  top: -25px;
+  top: -26px;
   width: 130px;
   z-index: 3;
-  filter: drop-shadow(0 16px 22px rgba(0,0,0,0.45));
-  pointer-events: none;
+
+  filter:
+    drop-shadow(0 18px 28px rgba(0,0,0,0.55))
+    drop-shadow(0 0 30px var(--glow-primary));
 }
 
 /* text */
 .prizeBubble h3 {
-  margin-top: 42px; /* leave room for image */
+  margin-top: 44px;
   margin-bottom: 6px;
-  font-size: 1rem;
-  font-weight: 700;
-  z-index: 2;
+
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+
+  background: linear-gradient(
+    90deg,
+    var(--accent-secondary),
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .prizeBubble span {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  z-index: 2;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  text-shadow: 0 0 12px var(--glow-secondary);
 }
 
 /* subtle hover (desktop) */
 .prizeBubble:hover {
-  transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.45);
+  transform: translateY(-14px) scale(1.06);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.7),
+    0 0 70px var(--glow-primary),
+    inset 0 1px 1px rgba(255,255,255,0.35);
 }
 
 /* floating zig-zag */
@@ -165,7 +203,7 @@
 
   .wrapper {
     height: auto;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     padding: 30px 20px;
     align-items: flex-start;
   }
@@ -202,7 +240,7 @@
   .wrapper {
     flex-direction: column;
     height: auto;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     padding: 28px 16px 60px;
     align-items: center;
     justify-content: flex-start;
@@ -264,4 +302,12 @@
 
   .prizeBubble h3 { font-size: 0.9rem; margin-top: 30px; }
   .prizeBubble span { font-size: 0.78rem; }
+}
+
+@media (max-width: 768px) {
+  .prizeBubble {
+    box-shadow:
+      0 18px 40px rgba(0,0,0,0.55),
+      0 0 30px var(--glow-secondary);
+  }
 }

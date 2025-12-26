@@ -13,27 +13,23 @@ import Register from "./components/Register/Register";
 import Prize from "./components/Prize/prize.jsx";
 
 import CategoryPage from "./components/Event/CategoryPage";
+import AppBackground from "./components/Background/Background.jsx";
 
 
 const App = () => { 
   return (
     <>
-      {/* <ParticlesBackground /> */}
-      {/* <BackgroundVideo /> */}
 
-      <div className="relative z-10   ">
+      <AppBackground>
         <Routes>
           <Route
             path="/"
             element={
               <>
                 <Navbar />
-             
-                {/* <Hero /> */}
                 <HeroSection />
                 <Event />
                 <Highlight />
-                <Prize />
                 <Contact />
                 <Sponsor />
                 <Footer />
@@ -56,7 +52,7 @@ const App = () => {
             element={<Prize />}
           />
         </Routes>
-      </div>
+      </AppBackground>
     </>
   );
 };

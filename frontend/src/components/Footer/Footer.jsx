@@ -6,7 +6,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className={styles.footer}>
+    <footer className={styles.footer} id="footer">
       <div className={styles.container}>
         <div className={styles.left}>
           <h3 className={styles.title}>COGNEBULA</h3>
@@ -91,17 +91,6 @@ export default function Footer() {
                     <a href="mailto:akumar@college.edu">akumar@college.edu</a>
                   </div>
                 </div>
-
-                {/* <div className={styles.coordItem}>
-                  <div>
-                    <div className={styles.coordName}>Ms. R. Singh</div>
-                    <div className={styles.coordRole}>Student Co‑ordinator</div>
-                  </div>
-                  <div className={styles.coordContact}>
-                    <a href="tel:+919876543210">+91 98765 43210</a>
-                    <a href="mailto:rsingh@college.edu">rsingh@college.edu</a>
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>

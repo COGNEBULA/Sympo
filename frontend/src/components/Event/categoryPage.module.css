@@ -1,59 +1,58 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap");
 
 :root {
-  --bg-dark: #0a0410;
-  --bg-darker: #050008;
-  --text-primary: #ffffff;
-  --text-secondary: #9aa0b3;
-  --text-muted: #6b7280;
-  --accent-red: #ff2a2a;
-  --accent-blue: #2ad3ff;
-  --accent-purple: #b026ff;
-  --accent-green: #1aff7b;
-  --accent-cyan: #00e5ff;
-  --glow-red: rgba(255, 42, 42, 0.3);
-  --glow-blue: rgba(42, 211, 255, 0.3);
-  --glow-purple: rgba(176, 38, 255, 0.3);
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --nebula-dark: #0a0410;
+  --nebula-mid: #1a0a1f;
+
+  --text-primary: #EAE6FF;
+  --text-secondary: #B6B5D8;
+  --text-muted: #8E8BBF;
+
+  --accent-primary: #CEA2FD;
+  --accent-secondary: #8968CD;
+  --accent-tertiary: #663399;
+
+  --glow-primary: rgba(206, 162, 253, 0.35);
+  --glow-secondary: rgba(137, 104, 205, 0.35);
+
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(206, 162, 253, 0.25);
 }
 
 /* Base Page */
 .page {
-  /* min-height: 100vh; */
-    min-height: 100vh;
-  /* overflow-x: hidden; */
-  background: var(--bg-dark);
-  color: var(--text-primary);
+  min-height: 100vh;
+  color: #EAE6FF;
   position: relative;
   overflow-x: hidden;
   font-family: 'Rajdhani', sans-serif;
-  scrollbar-width: none;
+  background: transparent;
 }
 
 /* Banner Styles */
 .banner {
   position: relative;
   height: 100vh;
-  min-height: 500px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-    transform-origin: center center;
-  will-change: transform, opacity;
+  backdrop-filter: blur(2px);
 }
 
 .grid {
   padding-top: 60px;
 }
+
 .overlay {
   position: absolute;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   inset: 0;
-  background: linear-gradient(
-    rgba(11, 4, 16, 0),
-    rgba(11, 4, 16, 0)
-  );
+  background:
+    radial-gradient(circle at 30% 20%, rgba(206,162,253,0.15), transparent 40%),
+    radial-gradient(circle at 70% 80%, rgba(137,104,205,0.15), transparent 45%);
   z-index: 1;
 }
 
@@ -113,25 +112,23 @@
   font-family: 'Orbitron', sans-serif;
   font-size: 4rem;
   font-weight: 900;
-  text-transform: uppercase;
   letter-spacing: 3px;
-  margin: 0 0 20px;
-  background: linear-gradient(135deg, #fff 0%, #a0a0ff 100%);
+  background: linear-gradient(
+    90deg,
+    var(--accent-secondary),
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
+  text-shadow: 0 0 40px var(--glow-primary);
 }
 
 .categoryBadge {
-  display: inline-block;
-  padding: 8px 20px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
-  backdrop-filter: blur(10px);
+  color: var(--accent-primary);
+  box-shadow: 0 0 20px var(--glow-primary);
 }
 
 .desc {
@@ -200,15 +197,17 @@
 /* Card */
 .card {
   position: relative;
-  background: rgba(20, 20, 30, 0.8);
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.02)
+  );
   border-radius: 20px;
-  overflow: hidden;
   border: 1px solid var(--glass-border);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  transform-style: preserve-3d;
-  perspective: 1000px;
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.4),
+    inset 0 0 30px rgba(206,162,253,0.05);
 }
 
 .card:hover {
@@ -220,14 +219,16 @@
   position: absolute;
   inset: 0;
   border-radius: 20px;
-  background: linear-gradient(45deg, 
-    transparent 0%, 
-    rgba(255, 42, 42, 0.1) 25%, 
-    rgba(42, 211, 255, 0.1) 75%, 
-    transparent 100%);
+  background: radial-gradient(
+    circle at top left,
+    var(--glow-primary),
+    transparent 60%
+  );
   opacity: 0;
   transition: opacity 0.4s ease;
-  pointer-events: none;
+}
+.card:hover .cardGlow {
+  opacity: 1;
 }
 
 .card:hover .cardGlow {
@@ -347,10 +348,8 @@
 
 .exploreButton {
   padding: 10px 20px;
-  background: rgb(176, 45, 241);
   color: white;
   border: none;
-  border-radius: 15px;
   font-family: 'Orbitron', sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
@@ -358,6 +357,13 @@
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s ease;
+  background: linear-gradient(
+    90deg,
+    var(--accent-tertiary),
+    var(--accent-secondary)
+  );
+  border-radius: 999px;
+  box-shadow: 0 0 30px var(--glow-secondary);
 }
 
 .exploreButton:hover {

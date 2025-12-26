@@ -7,7 +7,7 @@
 
 
 /* Reset */
-*{ box-sizing:border-box; margin:0; padding:0; }
+/* *{ box-sizing:border-box; margin:0; padding:0; } */
 
 @keyframes float {
   0%,100%{ transform: translateY(0) rotate(0deg); }

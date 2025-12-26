@@ -28,7 +28,7 @@ const CATEGORY_ICONS = {
 };
 
 const Construction={
-  workshop: "Thambi onnaku oru adirchi,The Workshop is under construction"
+  // workshop: "Thambi onnaku oru adirchi,The Workshop is under construction"
 }
 
 export default function CategoryPage() {
@@ -39,54 +39,54 @@ export default function CategoryPage() {
   const cardsRef = useRef([]);
 
   const categoryData = eventsData[category];
-useEffect(() => {
-  window.scrollTo(0, 0);
-}, [category]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [category]);
 
-  // Animation on mount
-useEffect(() => {
-  if (!bannerRef.current || !gridRef.current) return;
+    // Animation on mount
+  useEffect(() => {
+    if (!bannerRef.current || !gridRef.current) return;
 
-  const isMobile = window.innerWidth < 768;
+    const isMobile = window.innerWidth < 768;
 
-  if (!isMobile) {
+    if (!isMobile) {
+      gsap.fromTo(
+        bannerRef.current,
+        { scale: 1, y: 0, opacity: 1 },
+        {
+          scale: 0.85,
+          y: -120,
+          opacity: 0,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: bannerRef.current,
+            start: "top top",
+            end: "bottom+=100 top",
+            scrub: true,
+            pin: true,
+            pinSpacing: false,
+          },
+        }
+      );
+    }
+
     gsap.fromTo(
-      bannerRef.current,
-      { scale: 1, y: 0, opacity: 1 },
+      cardsRef.current,
+      { opacity: 0, y: 60 },
       {
-        scale: 0.85,
-        y: -120,
-        opacity: 0,
-        ease: "power2.out",
+        opacity: 1,
+        y: 0,
+        stagger: 0.12,
+        ease: "power3.out",
         scrollTrigger: {
-          trigger: bannerRef.current,
-          start: "top top",
-          end: "bottom+=100 top",
-          scrub: true,
-          pin: true,
-          pinSpacing: false,
+          trigger: gridRef.current,
+          start: "top 85%",
         },
       }
     );
-  }
 
-  gsap.fromTo(
-    cardsRef.current,
-    { opacity: 0, y: 60 },
-    {
-      opacity: 1,
-      y: 0,
-      stagger: 0.12,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: gridRef.current,
-        start: "top 85%",
-      },
-    }
-  );
-
-  return () => ScrollTrigger.getAll().forEach(t => t.kill());
-}, [category]);
+    return () => ScrollTrigger.getAll().forEach(t => t.kill());
+  }, [category]);
 
 
 
@@ -146,25 +146,23 @@ useEffect(() => {
     >
       {/* <Stromebreaker/> */}
       {/* ===== Parallax Banner ===== */}
-<motion.header
-  ref={bannerRef}
-  className={`${styles.banner} ${styles[color]}`}
-  initial={{ opacity: 0, y: -30 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6, ease: "easeOut" }}
-  style={{
-    backgroundImage: `linear-gradient(
-      rgba(11, 4, 16, 0.85),
-      rgba(11, 4, 16, 0.95)
-    ), url(${categoryData.img || "/default-banner.jpg"})`,
-    backgroundSize: "cover",
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "center",
-  }}
->
-
-
-        <div className={styles.overlay}>
+      <motion.header
+        ref={bannerRef}
+        className={`${styles.banner} ${styles[color]}`}
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        style={{
+          backgroundImage: `linear-gradient(
+            rgba(11, 4, 16, 0.85),
+            rgba(11, 4, 16, 0.95)
+          ), url(${categoryData.img || "/default-banner.jpg"})`,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className={`${styles.overlay} w-full`}>
             <button 
               className={styles.backButton}
               onClick={() => navigate(-1)}
@@ -200,24 +198,12 @@ useEffect(() => {
             >
               {description}
             </motion.p>
-
-            <motion.div 
-              className={styles.scrollIndicator}
-              animate={{ y: [0, 10, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            >
-              {/* <span>↓</span> */}
-            </motion.div>
           </div>
         </div>
       </motion.header>
 
       {/* ===== Event Cards Grid ===== */}
       <div className={styles.container}>
-              {/* <span className={styles.categoryIcon}>
-                {Construction[category] }
-              </span> */}
-
         <div ref={gridRef} className={styles.grid}>
           {events.map((event, index) => (
             <motion.article

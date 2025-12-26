@@ -3,6 +3,7 @@ import { CountdownTimer } from "./Clock/countdown-timer"
 import { Instagram } from "lucide-react"
 import Comet from './Comet';
 import styles from "../Navbar/navbar.module.css";
+import { RandomizedTextEffect } from "../../utils/TextEffect/TextEffect";
 export default function HeroSection() {
   const [mounted, setMounted] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -41,8 +42,8 @@ export default function HeroSection() {
       {/* Background effects */}
       {/* <Comet/> */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-[#301934] to-[#1a0a1f]" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#4B0082]/20 via-transparent to-[#663399]/10" />
+        {/* <div className="absolute inset-0 bg-gradient-to-br from-black via-[#301934] to-[#1a0a1f]" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#4B0082]/20 via-transparent to-[#663399]/10" /> */}
 
         {/* Mouse cursor glow effect */}
         {mounted && (
@@ -64,14 +65,14 @@ export default function HeroSection() {
           style={{ animationDelay: "1s" }}
         />
 
-        <div
+        {/* <div
           className="absolute inset-0 opacity-10"
           style={{
             backgroundImage:
               "linear-gradient(rgba(206, 162, 253, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(206, 162, 253, 0.1) 1px, transparent 1px)",
             backgroundSize: "100px 100px",
           }}
-        />
+        /> */}
 
         {/* AI-themed data particles that react to mouse */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -128,7 +129,7 @@ export default function HeroSection() {
             <div className="space-y-3 md:space-y-4">
               <h1 className=" relative text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-none font-mono">
                 <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#663399] via-[#CEA2FD] to-[#8968CD] animate-glow typing-text">
-                  COGNEBULA
+                  <RandomizedTextEffect text="COGNEBULA" />
                 </span>
                   <div className={styles.hangAnchor} aria-hidden="true">
                             {/* <div className={styles.fishHook} />   */}
@@ -240,7 +241,7 @@ export default function HeroSection() {
               <div className="flex items-center justify-center lg:justify-start gap-3 md:gap-4">
                 <div className="h-[2px] w-8 md:w-12 bg-gradient-to-r from-transparent to-[#CEA2FD]" />
                 <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#CEA2FD] font-mono">
-                  2026
+                  <RandomizedTextEffect text="2026" />
                 </span>
                 <div className="h-[2px] w-8 md:w-12 bg-gradient-to-l from-transparent to-[#CEA2FD]" />
               </div>
