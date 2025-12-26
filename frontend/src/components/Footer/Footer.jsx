@@ -6,7 +6,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className={styles.footer} id="footer">
+    <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.left}>
           <h3 className={styles.title}>COGNEBULA</h3>
@@ -15,6 +15,7 @@ export default function Footer() {
             subject-matter experts, participate in workshops and collaborate with
             peers from across departments.
           </p>
+
           <div className={styles.socials}>
             <a
               href="https://instagram.com"
@@ -58,7 +59,7 @@ export default function Footer() {
 
         <div className={styles.right}>
           <div className={styles.columns}>
-            <div className={styles.group}>
+            <div className={`${styles.group} ${styles.links}`}>
               <h4 className={styles.groupTitle}>Quick Links</h4>
               <ul className={styles.list}>
                 <li><a href="#about">About</a></li>
@@ -68,7 +69,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            <div className={styles.group}>
+            <div className={`${styles.group} ${styles.events}`}>
               <h4 className={styles.groupTitle}>Event Links</h4>
               <ul className={styles.list}>
                 <li><a href="#paper">Paper Submission</a></li>
@@ -78,19 +79,31 @@ export default function Footer() {
               </ul>
             </div>
 
-            <div className={styles.group}>
-              <h4 className={styles.groupTitle}>Co‑ordinators</h4>
+            <div className={`${styles.group} ${styles.coords}`}>
+              <h4 className={styles.groupTitle}>Co-ordinators</h4>
               <div className={styles.coordList}>
                 <div className={styles.coordItem}>
                   <div>
                     <div className={styles.coordName}>Dr. A. Kumar</div>
-                    <div className={styles.coordRole}>Faculty Co‑ordinator</div>
+                    <div className={styles.coordRole}>Faculty Co-ordinator</div>
                   </div>
                   <div className={styles.coordContact}>
                     <a href="tel:+911234567890">+91 12345 67890</a>
                     <a href="mailto:akumar@college.edu">akumar@college.edu</a>
                   </div>
                 </div>
+
+                {/* Uncomment if needed */}
+                {/* <div className={styles.coordItem}>
+                  <div>
+                    <div className={styles.coordName}>Ms. R. Singh</div>
+                    <div className={styles.coordRole}>Student Co-ordinator</div>
+                  </div>
+                  <div className={styles.coordContact}>
+                    <a href="tel:+919876543210">+91 98765 43210</a>
+                    <a href="mailto:rsingh@college.edu">rsingh@college.edu</a>
+                  </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -105,5 +118,3 @@ export default function Footer() {
     </footer>
   );
 }
-
-
