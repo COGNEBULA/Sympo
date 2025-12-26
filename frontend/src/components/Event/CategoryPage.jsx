@@ -5,7 +5,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
 import styles from "./categoryPage.module.css";
 import eventsData from "./eventlist.json";
-
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -40,50 +39,56 @@ export default function CategoryPage() {
   const cardsRef = useRef([]);
 
   const categoryData = eventsData[category];
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, [category]);
 
   // Animation on mount
-  useEffect(() => {
-    // Parallax effect for banner
-    gsap.fromTo(bannerRef.current,
-      { backgroundPositionY: "0%" },
+useEffect(() => {
+  if (!bannerRef.current || !gridRef.current) return;
+
+  const isMobile = window.innerWidth < 768;
+
+  if (!isMobile) {
+    gsap.fromTo(
+      bannerRef.current,
+      { scale: 1, y: 0, opacity: 1 },
       {
-        backgroundPositionY: "20%",
-        ease: "none",
+        scale: 0.85,
+        y: -120,
+        opacity: 0,
+        ease: "power2.out",
         scrollTrigger: {
           trigger: bannerRef.current,
           start: "top top",
-          end: "bottom top",
-          scrub: true
-        }
+          end: "bottom+=100 top",
+          scrub: true,
+          pin: true,
+          pinSpacing: false,
+        },
       }
     );
+  }
 
-    // Stagger card animations
-    gsap.fromTo(cardsRef.current,
-      {
-        opacity: 0,
-        y: 30,
-        scale: 0.9
+  gsap.fromTo(
+    cardsRef.current,
+    { opacity: 0, y: 60 },
+    {
+      opacity: 1,
+      y: 0,
+      stagger: 0.12,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: gridRef.current,
+        start: "top 85%",
       },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "back.out(1.7)",
-        scrollTrigger: {
-          trigger: gridRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
+    }
+  );
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, [category]);
+  return () => ScrollTrigger.getAll().forEach(t => t.kill());
+}, [category]);
+
+
 
   // ❌ Invalid category
   if (!categoryData) {
@@ -139,23 +144,25 @@ export default function CategoryPage() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      {/* <Stromebreaker/> */}
       {/* ===== Parallax Banner ===== */}
-<motion.header 
+<motion.header
   ref={bannerRef}
   className={`${styles.banner} ${styles[color]}`}
-  initial={{ y: -50, opacity: 0 }}
-  animate={{ y: 0, opacity: 1 }}
-  transition={{ duration: 0.8 }}
+  initial={{ opacity: 0, y: -30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6, ease: "easeOut" }}
   style={{
     backgroundImage: `linear-gradient(
       rgba(11, 4, 16, 0.85),
       rgba(11, 4, 16, 0.95)
-    ), url(${categoryData.img || '/default-banner.jpg'})`,
-    backgroundSize: 'cover',      // Makes the image cover the entire header
-    backgroundRepeat: 'no-repeat', // Prevents repeating
-    backgroundPosition: 'center'   // Optional: centers the image
+    ), url(${categoryData.img || "/default-banner.jpg"})`,
+    backgroundSize: "cover",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center",
   }}
 >
+
 
         <div className={styles.overlay}>
             <button 
@@ -207,9 +214,9 @@ export default function CategoryPage() {
 
       {/* ===== Event Cards Grid ===== */}
       <div className={styles.container}>
-              <span className={styles.categoryIcon}>
-                {Construction[category]}
-              </span>
+              {/* <span className={styles.categoryIcon}>
+                {Construction[category] }
+              </span> */}
 
         <div ref={gridRef} className={styles.grid}>
           {events.map((event, index) => (

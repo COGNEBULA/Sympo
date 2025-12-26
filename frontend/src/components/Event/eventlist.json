@@ -244,12 +244,33 @@
       ]
     }
   },
-  "workshop": {
-    "color": "neonred",
-  "icon":  "/flyicon/spydi.png",
-  "img" : "/eventimg/workshop.png",
+"workshop": {
+  "color": "neonred",
+  "icon": "/flyicon/spydi.png",
+  "img": "/eventimg/workshop.png",
   "date": "07/02/2026",
-    "description":"workshop desccrnnn"
-  }
+  "description": "Workshop description",
+
+    "DOthethink": {
+      "id": "nontech05",
+      "title": "Short Film Contest",
+      "sympoImg": "/images/nontech/shortfilm.jpg",
+      "description": "Create and submit an original short film based on the given theme.",
+      "rules": [
+        "Maximum duration: 5 minutes",
+        "Any genre allowed",
+        "Original content only"
+      ],
+      "hurryUp": "Submit early!",
+      "eventLeader": {
+        "name": "Kiran S",
+        "phone": "9554433221"
+      },
+      "coordinators": [
+        { "name": "Lakshmi N", "phone": "9667788990" }
+      ]
+    }
+    
+}
 
 }

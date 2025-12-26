@@ -2,19 +2,23 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./event.module.css";
 import { useNavigate } from "react-router-dom";
 import eventsData from "./eventlist.json";
-import StormbreakerCinematic  from "./StormbreakerCinematic.jsx";
+// import StormbreakerCinematic  from "./StormbreakerCinematic.jsx";
 
 
-const CATEGORY_META_KEYS = ["color", "icon", "date", "description", "id"];
+const CATEGORY_META_KEYS = ["color", "icon", "date", "description", "id","img"];
 
 const buildTimelineData = (eventsData) =>
   Object.entries(eventsData).map(([type, category]) => {
     const { color, icon, img, date, description } = category;
 
-    const events = Object.entries(category)
-      .filter(([key]) => !CATEGORY_META_KEYS.includes(key))
-      .map(([_, ev]) => ev);
+const events = Object.entries(category)
+  .filter(([key]) => !CATEGORY_META_KEYS.includes(key))
+  .map(([key, ev]) => ({
+    key,      // 🔥 DOthethink
+    ...ev
+  }));
 
+// console.log(eventsData);  
     return {
       type,
       title:
@@ -38,9 +42,21 @@ export default function Event() {
   const wrapRef = useRef(null);
   const [expandedCard, setExpandedCard] = useState(null);
   const navigate = useNavigate();
-  const handleCategoryRedirect = (category) => {
-  navigate(`/events/${category}`);
+const handleCardClick = (item, index) => {
+  if (item.type === "workshop") {
+    const firstWorkshopEvent = item.events?.[0];
+
+    if (firstWorkshopEvent?.key) {
+      navigate(`/event/workshop/${firstWorkshopEvent.key}`);
+    }
+    return;
+  }
+
+  toggleCard(index);
+  navigate(`/events/${item.type}`);
 };
+
+
 
   const data = buildTimelineData(eventsData);
 
@@ -65,7 +81,6 @@ export default function Event() {
 
   return (
     <section className={styles.page} id="events">
-      <StormbreakerCinematic />
       <header className={styles.header}>
         <h1 className={styles.title}>OUR EVENTS</h1>
         <div className={styles.underline} />
@@ -104,25 +119,18 @@ export default function Event() {
               </div>
 
               {/* card */}
-<article 
-  className={`${styles.card} ${expandedCard === i ? styles.cardExpanded : ''} ${styles.cardGlow}`} 
+<article
+  className={`${styles.card} ${
+    expandedCard === i ? styles.cardExpanded : ""
+  } ${styles.cardGlow}`}
   tabIndex={0}
-  onClick={() => {
-  toggleCard(i);
-  handleCategoryRedirect(item.type);
-}}
-
-  onKeyDown={(e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      toggleCard(i);
-    }
-  }}
   role="button"
   aria-expanded={expandedCard === i}
-  aria-label={`${expandedCard === i ? 'Collapse' : 'Expand'} ${item.title}`}
+  aria-label={`${expandedCard === i ? "Collapse" : "Expand"} ${item.title}`}
   data-expanded={expandedCard === i}
+  onClick={() => handleCardClick(item, i)}
 >
+
   {/* Gradient background overlay */}
   <div className={styles.cardGradient}></div>
   

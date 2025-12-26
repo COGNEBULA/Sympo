@@ -19,14 +19,14 @@ export default function StormbreakerCinematic() {
       gsap.fromTo(
         axeRef.current,
         {
-          x: -150,
-          y: -150,
+          x: -250,
+          y: -250,
           rotate: -45,
           opacity: 0,
         },
         {
-          x: "70vw",
-          y: "60vh",
+          x: "110vw",
+          y: "110vh",
           rotate: 720,
           opacity: 1,
           ease: "none",
@@ -41,7 +41,7 @@ export default function StormbreakerCinematic() {
 
       // Thanos shake on hit
       gsap.to(thanosRef.current, {
-        x: -15,
+        x: -65,
         repeat: 6,
         yoyo: true,
         duration: 0.06,
