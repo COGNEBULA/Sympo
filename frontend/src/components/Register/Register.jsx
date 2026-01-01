@@ -24,7 +24,8 @@ function EventGroupCard({
   setTeamName,
   setTeamCode,
   gradient,
-  isSoloOnlyEvent
+  getSelectedSessions,
+  setTeamData
 }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -65,10 +66,6 @@ function EventGroupCard({
                     </label>
                   </div>
 
-                  {isSoloOnlyEvent(event) && (
-                    <span className={styles.specialBadge}>Solo Only</span>
-                  )}
-
                   <div className={styles.badges}>
                     {full && <span className={styles.fullBadge}>Slot Full</span>}
                     {hurryUp && !full && (
@@ -78,6 +75,46 @@ function EventGroupCard({
                     )}
                   </div>
                 </div>
+
+                {selected && event.isBoth && (
+                  <div className={styles.sessionSelect}>
+                    <label className={styles.sessionLabel}>Choose Session</label>
+
+                    <div className={styles.sessionOptions}>
+                      {["morning", "afternoon"].map((session) => {
+                        const selectedSessions = getSelectedSessions();
+                        const isDisabled =
+                          selectedSessions.includes(session) &&
+                          teamData[event.event_name]?.session !== session;
+
+                        return (
+                          <label
+                            key={session}
+                            className={`${styles.sessionOption} ${isDisabled ? styles.disabled : ""}`}
+                          >
+                            <input
+                              type="radio"
+                              name={`session-${event.event_name}`}
+                              value={session}
+                              disabled={isDisabled}
+                              checked={teamData[event.event_name]?.session === session}
+                              onChange={() =>
+                                setTeamData(prev => ({
+                                  ...prev,
+                                  [event.event_name]: {
+                                    ...(prev[event.event_name] || {}),
+                                    session
+                                  }
+                                }))
+                              }
+                            />
+                            <span>{session === "morning" ? "Forenoon" : "Afternoon"}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 <div className={styles.eventMeta}>
                   <span className={styles.metaItem}>
@@ -194,6 +231,12 @@ export default function RegisterPage() {
     );
   };
 
+  const getSelectedSessions = () => {
+    return selectedEvents
+      .map(e => teamData[e.event_name]?.session)
+      .filter(Boolean);
+  };
+
   const calculateAmount = (selectedArr) => {
     let hasTech = false
     let hasNonTech = false
@@ -263,6 +306,13 @@ export default function RegisterPage() {
       return "You can select only 2 events at once";
     }
 
+    const selectedSessions = getSelectedSessions();
+
+    if (event.isBoth && selectedSessions.length === 1) {
+      // Allow selection, but radio button will restrict session choice
+      return null;
+    }
+
     return null;
   };
 
@@ -326,16 +376,16 @@ export default function RegisterPage() {
     events: selectedEvents.map((event) => {
       const team = teamData[event.event_name];
 
-      if (event.event_type === "team") {
-        return {
-          event_name: event.event_name,
+      return {
+        event_name: event.event_name,
+        ...(event.isBoth && { session: team.session }),
+
+        ...(event.event_type === "team" && {
           role: team?.role === "leader" ? "lead" : "member",
           ...(team?.role === "leader" && { team_name: team.teamName }),
           ...(team?.role === "member" && { team_code: team.teamCode }),
-        };
-      }
-
-      return { event_name: event.event_name };
+        }),
+      };
     }),
   });
 
@@ -343,10 +393,12 @@ export default function RegisterPage() {
   const handleRegisterAndPay = async () => {
     try {
       if (!validate()) return;
+
       if (!food) {
         toast.warn("Please select food preference");
         return;
       }
+
       for (const event of selectedEvents) {
         if (event.event_type === "team") {
           const team = teamData[event.event_name];
@@ -363,6 +415,16 @@ export default function RegisterPage() {
 
           if (team.role === "member" && !team.teamCode?.trim()) {
             toast.error(`Enter team code for ${event.event_name}`);
+            return;
+          }
+        }
+      }
+
+      for (const event of selectedEvents) {
+        if (event.isBoth) {
+          const session = teamData[event.event_name]?.session;
+          if (!session) {
+            toast.error(`Select session for ${event.event_name}`);
             return;
           }
         }
@@ -684,7 +746,8 @@ export default function RegisterPage() {
                     setTeamName={setTeamName}
                     setTeamCode={setTeamCode}
                     gradient={group.gradient}
-                    isSoloOnlyEvent={isSoloOnlyEvent}
+                    getSelectedSessions={getSelectedSessions}
+                    setTeamData={setTeamData}
                   />
                 ))}
               </div>
@@ -702,7 +765,7 @@ export default function RegisterPage() {
                   selectedEvents.map((event) => (
                     <div key={event.event_name} className={styles.summaryItem}>
                       <span>{event.event_name}</span>
-                      <span className={styles.price}>₹{event.event_mode === "workshop" ? "300" : "200"}</span>
+                      <span className={styles.price}>{event.event_mode === "workshop" ? "₹ 300" : ""}</span>
                     </div>
                   ))
                 )}
@@ -760,14 +823,16 @@ export default function RegisterPage() {
             </div>
 
             <div className={styles.infoCard}>
-              <AlertCircle size={20} />
-              <h4>Important Notes</h4>
+              <div className="flex items-center gap-4 text-red-400">
+                <AlertCircle size={20} />
+                <h4>Important Notes</h4>
+              </div>
               <ul>
                 <li>Maximum 2 events per participant</li>
                 <li>2nd event participation is based on time availability</li>
                 <li>Workshop / Hack Quest must be selected alone</li>
                 <li>Food preference is mandatory</li>
-                <li>Team codes are required for team events <br />(Team code will be mail to Tead Leader)</li>
+                <li>Team codes are required for team events <br />(Team code will be mailed to Tead Leader)</li>
               </ul>
             </div>
           </div>

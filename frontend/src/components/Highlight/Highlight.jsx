@@ -48,7 +48,7 @@ export default function Highlight() {
         {/* 250+ */}
         <div className={`${styles.card} ${styles.statCard}`}>
           <div className={styles.ambientGlow} />
-          <div className={styles.statBig}>250+</div>
+          <div className={styles.statBig}>650+</div>
           <div className={styles.statSmall}>PARTICIPANTS</div>
         </div>
 
@@ -65,8 +65,8 @@ export default function Highlight() {
         {/* 50+ */}
         <div className={`${styles.card} ${styles.statCard}`}>
           <div className={styles.ambientGlow} />
-          <div className={styles.statBig}>50+</div>
-          <div className={styles.statSmall}>TEAMS</div>
+          <div className={styles.statBig}>10+</div>
+          <div className={styles.statSmall}>Events</div>
         </div>
 
         {/* Center image */}
@@ -84,8 +84,8 @@ export default function Highlight() {
         {/* Workshop */}
         <div className={`${styles.card} ${styles.workshopCard}`}>
           <div className={styles.ambientGlow} />
-          <div className={styles.workshopTitle}>WORKSHOP</div>
-          <div className={styles.workshopSub}>DJANGO</div>
+          <div className={styles.workshopTitle}>Worth 1 Lakh</div>
+          <div className={styles.workshopSub}>Cash prizes</div>
         </div>
 
         {/* Bottom right */}

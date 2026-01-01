@@ -23,7 +23,7 @@ const events = Object.entries(category)
           ? "Technical Events"
           : type === "nontech"
           ? "Non-Technical Events"
-          : "Work Shop",
+          : "WorkShop",
       date: date || events[0]?.date || "Coming Soon",
       desc:
         description ||
@@ -46,8 +46,7 @@ export default function Event() {
       // if (firstWorkshopEvent?.key) {
       //   navigate(`/event/workshop/${firstWorkshopEvent.key}`);
       // }
-      // return;
-      navigate('/')
+      return;
     }
 
     toggleCard(index);
