@@ -2,7 +2,6 @@ const { getClient } = require("../config/db");
 
 const { sendWelcomeMail } = require("../services/mail_service");
 const { appendToGoogleSheet } = require("../services/excel_service");
-const { checkSlotAvailability } = require("../services/slot_service");
 const { resolveTeamRegistration } = require("../services/team_service");
 
 const {
@@ -22,6 +21,7 @@ const {
 =============================== */
 async function register(req, res, next) {
   const client = await getClient(); // 🔐 single DB connection
+  let email;
 
   try {
     /* ===============================
@@ -31,7 +31,7 @@ async function register(req, res, next) {
 
     const {
       name,
-      email,
+      email: reqEmail,
       phone,
       college,
       student_year,
@@ -39,6 +39,8 @@ async function register(req, res, next) {
       events,
       registration_mode
     } = req.body;
+
+    email = reqEmail;
 
     /* ===============================
        BASIC VALIDATION
@@ -53,6 +55,22 @@ async function register(req, res, next) {
 
     if (!["online", "onspot"].includes(registration_mode)) {
       throw ValidationError("Invalid registration mode");
+    }
+
+    /* ===============================
+       SLOT RESERVATION CHECK (NEW)
+    =============================== */
+    const reservationRes = await client.query(
+      `SELECT * FROM slot_reservations WHERE email = $1`,
+      [email]
+    );
+
+    if (reservationRes.rowCount === 0) {
+      throw ConflictError("Reservation expired. Please retry.");
+    }
+
+    if (reservationRes.rowCount !== events.length) {
+      throw ConflictError("Reservation mismatch. Please retry.");
     }
 
     /* ===============================
@@ -85,10 +103,10 @@ async function register(req, res, next) {
        PROCESS EVENTS
     =============================== */
     for (const ev of events) {
-      const { event_name, role, team_name, team_code } = ev;
+      const { event_name } = ev;
 
       const eventRes = await client.query(
-        `SELECT id, event_type, teammembers, max_teams, max_online_teams
+        `SELECT id, event_type
          FROM events WHERE event_name = $1`,
         [event_name]
       );
@@ -99,24 +117,20 @@ async function register(req, res, next) {
 
       const event = eventRes.rows[0];
 
-      const isIndividual = event.event_type === "individual";
-      const isTeamLead = event.event_type === "team" && role === "lead";
+      /* -------------------------------
+         MATCH RESERVATION
+      ------------------------------- */
+      const reservation = reservationRes.rows.find(
+        r => r.event_id === event.id
+      );
 
-      /* ===============================
-         SLOT CHECK (SERVICE)
-      =============================== */
-      if (isIndividual || isTeamLead) {
-        await checkSlotAvailability({
-          client,
-          event,
-          registration_mode,
-          event_name
-        });
+      if (!reservation) {
+        throw ConflictError(`Reservation mismatch for ${event_name}`);
       }
 
-      /* ===============================
-         TEAM LOGIC (SERVICE)
-      =============================== */
+      /* -------------------------------
+         TEAM LOGIC (UNCHANGED)
+      ------------------------------- */
       const {
         finalRole,
         finalTeamName,
@@ -124,27 +138,26 @@ async function register(req, res, next) {
       } = await resolveTeamRegistration({
         client,
         event,
-        role,
-        team_name,
-        team_code
+        role: reservation.role,
+        team_name: reservation.team_name,
+        team_code: reservation.team_code
       });
 
-      /* ===============================
-         INSERT REGISTRATION EVENT
-      =============================== */
       await client.query(
-        `INSERT INTO registration_events
-         (registration_id, event_id, role, team_name, team_code, registration_mode)
-         VALUES ($1,$2,$3,$4,$5,$6)`,
-        [
-          registrationId,
-          event.id,
-          finalRole,
-          finalTeamName,
-          finalTeamCode,
-          registration_mode
-        ]
-      );
+  `INSERT INTO registration_events
+   (registration_id, event_id, role, team_name, team_code, session, registration_mode)
+   VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+  [
+    registrationId,
+    event.id,
+    finalRole,
+    finalTeamName,
+    finalTeamCode,
+    reservation.session || null,
+    registration_mode
+  ]
+);
+
 
       responseEvents.push({
         event_name,
@@ -171,19 +184,8 @@ async function register(req, res, next) {
     await client.query("COMMIT");
 
     /* ===============================
-       SIDE EFFECTS (OUTSIDE TX)
+       SIDE EFFECTS (POST COMMIT)
     =============================== */
-    const eventsList = responseEvents.map(e => e.event_name).join(", ");
-
-    appendToGoogleSheet({
-      email,
-      name,
-      college,
-      year: student_year,
-      events: eventsList,
-      food
-    }).catch(console.error);
-
     const qrBuffer = await generateFoodQRBuffer(foodToken);
 
     const receipt = buildReceiptData({
@@ -201,6 +203,23 @@ async function register(req, res, next) {
 
     sendWelcomeMail(receipt).catch(console.error);
 
+    appendToGoogleSheet({
+      email,
+      name,
+      college,
+      year: student_year,
+      events: responseEvents.map(e => e.event_name).join(", "),
+      food
+    }).catch(console.error);
+
+    /* ===============================
+       CLEAR RESERVATION
+    =============================== */
+    await client.query(
+      `DELETE FROM slot_reservations WHERE email = $1`,
+      [email]
+    );
+
     return res.status(201).json({
       success: true,
       receipt
@@ -208,9 +227,17 @@ async function register(req, res, next) {
 
   } catch (err) {
     await client.query("ROLLBACK");
-    next(err); // 🔥 centralized error handling
+
+    if (email) {
+      await client.query(
+        `DELETE FROM slot_reservations WHERE email = $1`,
+        [email]
+      );
+    }
+
+    next(err);
   } finally {
-    client.release(); // 🔓 IMPORTANT
+    client.release();
   }
 }
 

@@ -1,5 +1,9 @@
 const { query } = require("../config/db");
 const { ValidationError } = require("../errors/error");
+const {
+  reserveSlotsService,
+  releaseReservationService
+} = require("../services/slot_service");
 
 async function getAllEventsLiveSlots(req, res, next) {
   try {
@@ -94,6 +98,28 @@ async function getAllEventsLiveSlots(req, res, next) {
   }
 }
 
+async function reserveSlots(req, res, next) {
+  try {
+    await reserveSlotsService(req.body);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function releaseReservation(req, res, next) {
+  try {
+    const released = await releaseReservationService(req.body.email);
+    res.json({
+      success: true,
+      released,
+      message: "Reservation released successfully"
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
-  getAllEventsLiveSlots
+  getAllEventsLiveSlots, reserveSlots, releaseReservation
 };
