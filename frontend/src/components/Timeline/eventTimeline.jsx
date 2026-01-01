@@ -5,15 +5,15 @@ import { Terminal, Zap, Code, Coffee, Users } from "lucide-react"
 const events = [
   {
     id: 1,
-    time: "08:30 AM",
-    title: "Event Start",
+    time: "TBA",
+    title: "Event Starts",
     description: "Registration & Welcome",
     icon: <Users className="w-5 h-5 text-purple-400" />,
     type: "main",
   },
   {
     id: 2,
-    time: "09:30 AM",
+    time: "TBA",
     title: "Inauguration",
     description: "Grand Opening Ceremony",
     icon: <Zap className="w-5 h-5 text-purple-400" />,
@@ -21,7 +21,7 @@ const events = [
 },
 {
     id: 3,
-    time: "10:30 AM",
+    time: "TBA",
     title: "Parallel Sessions",
     description: "Tech & Non-Tech Tracks",
     icon: <Zap className="w-5 h-5 text-purple-400" />,
@@ -33,23 +33,23 @@ const events = [
   },
   {
     id: 4,
-    time: "12:30 PM",
+    time: "TBA",
+    title: "Workshop",
+    description: "Hands-on AI Lab",
+    icon: <Code className="w-5 h-5 text-purple-400" />,
+    type: "workshop",
+  },
+  {
+    id: 5,
+    time: "TBA",
     title: "Lunch Break",
     description: "Networking & Refreshments",
     icon: <Coffee className="w-5 h-5 text-purple-400" />,
     type: "break",
   },
   {
-    id: 5,
-    time: "01:30 PM",
-    title: "Workshops",
-    description: "Hands-on AI Lab",
-    icon: <Code className="w-5 h-5 text-purple-400" />,
-    type: "workshop",
-  },
-  {
     id: 6,
-    time: "04:30 PM",
+    time: "TBA",
     title: "Closing Ceremony",
     description: "Awards & Wrap-up",
     icon: <Zap className="w-5 h-5 text-purple-400" />,
@@ -104,7 +104,7 @@ export default function EventTimeline() {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-bold text-white font-orbitron mb-4 text-center"
+            className="text-4xl md:text-6xl font-bold text-[#CEA2FD] font-orbitron mb-4 text-center"
           >
             Symposium Roadmap
           </motion.h2>

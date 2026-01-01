@@ -21,6 +21,18 @@
   overflow: hidden;
 }
 
+.orpage {
+  /* min-height: 420px; */
+  padding: 0px 28px;
+  background: transparent; /* IMPORTANT */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
 /* header */
 .headerWrap{
   text-align:center;
@@ -75,8 +87,17 @@
 
   padding: 22px 28px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   transition: transform .45s ease, box-shadow .45s ease;
+}
+
+.personBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
 }
 
 .card::before {
@@ -148,12 +169,28 @@
   z-index:2;
   max-width:600px;
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
+  gap: 10%;
   justify-content: center;
   width: 100%;
   align-items: center;
   color:var(--muted);
 }
+
+.orinfo{
+  position:relative;
+  z-index:2;
+  max-width:600px;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  gap: 10%;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
+  color:var(--muted);
+}
+
 .left{
   margin-left:140px;
   text-align:center;
