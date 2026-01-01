@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import Footer from "./components/Footer/Footer.jsx";
-import Sponsor from "./components/Sponsor/sponsor.jsx";
 import HeroSection from "./components/Hero/hero-section.jsx";
 import { Routes, Route } from "react-router-dom";
 
@@ -17,6 +16,7 @@ import EventTimeline from "./components/Timeline/eventTimeline.jsx";
 import Scanner from "./components/QR Scanner/Scanner.jsx";
 import NotFound from "./components/404/notfound.jsx";
 import RegisterGate from "./components/Register/RegisterGateWay.jsx";
+import Organizer from "./components/Organizer/Organizer.jsx";
 
 
 const App = () => { 
@@ -33,8 +33,8 @@ const App = () => {
                 <Event />
                 <EventTimeline />
                 <Highlight />
+                <Organizer />
                 <Contact />
-                {/* <Sponsor /> */}
                 <Footer />
               </>
             }

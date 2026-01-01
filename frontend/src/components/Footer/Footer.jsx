@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./footer.module.css";
-import { Instagram, Facebook, Mail, Linkedin } from "lucide-react";
+import { Instagram, Facebook, Mail, Linkedin, MessageCircle } from "lucide-react";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -48,10 +48,10 @@ export default function Footer() {
               href="#"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Facebook"
+              aria-label="WhatsApp"
               className={styles.social}
             >
-              <Facebook size={20} />
+              <MessageCircle size={20} />
             </a>
           </div>
         </div>
@@ -73,17 +73,16 @@ export default function Footer() {
               <ul className={styles.list}>
                 <li><a href="/events/tech">Technical</a></li>
                 <li><a href="/events/nontech">Non Technical</a></li>
-                <li><a href="/workshops">Workshops</a></li>
+                <li><a href="#">Workshops</a></li>
               </ul>
             </div>
 
             <div className={styles.group}>
-              <h4 className={styles.groupTitle}>Faculty Co‑ordinators</h4>
+              {/* <h4 className={styles.groupTitle}>Faculty Co‑ordinators</h4>
               <div className={styles.coordList}>
                 <div className={styles.coordItem}>
                   <div>
                     <div className={styles.coordName}>   Mrs. M. Priya</div>
-                    {/* <div className={styles.coordRole}>Faculty Co‑ordinator</div> */}
                   </div>
                   <div className={styles.coordContact}>
                     <a href="tel:9841170770">+91 98411 70770</a>
@@ -93,14 +92,13 @@ export default function Footer() {
                 <div className={styles.coordItem}>
                   <div>
                     <div className={styles.coordName}>Mrs. S. Mythili</div>
-                    {/* <div className={styles.coordRole}>Faculty Co‑ordinator</div> */}
                   </div>
                   <div className={styles.coordContact}>
-                    <a href="tel:0626901493">+91 96269 01493</a>
+                    <a href="tel:9626901493">+91 96269 01493</a>
                     <a href="mailto:mythili@velammal.edu.in">mythili@velammal.edu.in</a>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 

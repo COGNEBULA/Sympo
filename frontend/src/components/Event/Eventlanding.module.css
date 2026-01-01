@@ -24,6 +24,14 @@
     inset 0 1px 1px rgba(255,255,255,0.18);
 }
 
+.section strong {
+  font-weight: 800;
+  color: #ffcc00;
+  background: rgba(255, 204, 0, 0.12);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
 /* Base Styles */
 .page {
   height: 100vh;
@@ -877,3 +885,34 @@
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, var(--accent-mag), var(--accent-purple));
 } */
+
+/* =========================================
+   iPhone Portrait (SE → Pro Max)
+   375px – 430px
+   ========================================= */
+@media screen and (max-width: 430px) {
+
+  .mainContent {
+    gap: 24px;
+  }
+
+  .eventHeader h1 {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .description {
+    font-size: 14px;
+  }
+
+  .infoGrid {
+    gap: 14px;
+  }
+
+  .leaderCard,
+  .section,
+  .leadershipSection,
+  .certificationSection {
+    border-radius: 14px;
+  }
+}

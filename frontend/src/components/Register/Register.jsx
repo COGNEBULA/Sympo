@@ -24,7 +24,6 @@ function EventGroupCard({
   setTeamName,
   setTeamCode,
   gradient,
-  isSoloOnlyEvent
 }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -65,15 +64,11 @@ function EventGroupCard({
                     </label>
                   </div>
 
-                  {isSoloOnlyEvent(event) && (
-                    <span className={styles.specialBadge}>Solo Only</span>
-                  )}
-
                   <div className={styles.badges}>
                     {full && <span className={styles.fullBadge}>Slot Full</span>}
                     {hurryUp && !full && (
                       <span className={styles.hurryBadge}>
-                        <Clock size={12} /> Hurry
+                        <Clock size={12} /> {event.message}
                       </span>
                     )}
                   </div>
@@ -83,6 +78,13 @@ function EventGroupCard({
                   <span className={styles.metaItem}>
                     {event.event_type === "team" ? <Users size={14} /> : <User size={14} />}
                     {event.event_type === "team" ? "Team Event" : "Solo Event"}
+                  </span>
+                  <span
+                    className={`${styles.sessionBadge} ${
+                      event.isBoth ? styles.multiSession : styles.singleSession
+                    }`}
+                  >
+                    {event.isBoth ? "2 Sessions" : "Single Session"}
                   </span>
                   {event.event_mode === "workshop" && (
                     <span className={`${styles.priceTag} bg-gradient-to-r ${gradient}`}>₹300</span>
@@ -194,6 +196,15 @@ export default function RegisterPage() {
     );
   };
 
+  const isSingleSessionEvent = (event) => !event.isBoth;
+  const isMultiSessionEvent = (event) => event.isBoth;
+
+  const getSelectedSessions = () => {
+    return selectedEvents
+      .map(e => teamData[e.event_name]?.session)
+      .filter(Boolean);
+  };
+
   const calculateAmount = (selectedArr) => {
     let hasTech = false
     let hasNonTech = false
@@ -235,11 +246,7 @@ export default function RegisterPage() {
     return Object.keys(err).length === 0
   }
 
-  const isHurryUp = (event) => {
-    if (!event.onlineSlots || event.onlineSlots === 0) return false
-    const percentageLeft = (event.onlineRemaining / event.onlineSlots) * 100
-    return percentageLeft <= 30
-  }
+  const isHurryUp = (event) => event.status === "HURRY_UP";
 
   const isFull = (event) => event.status === "FULL" || event.remainingSlots === 0
 
@@ -261,6 +268,27 @@ export default function RegisterPage() {
 
     if (selected.length >= 2) {
       return "You can select only 2 events at once";
+    }
+
+    const selectedSessions = getSelectedSessions();
+
+    if (event.isBoth && selectedSessions.length === 1) {
+      // Allow selection, but radio button will restrict session choice
+      return null;
+    }
+
+    if (selected.length === 1) {
+      const firstEvent = selected[0];
+
+      // If first is single-session, second must be multi-session
+      if (
+        (isSingleSessionEvent(firstEvent) &&
+        isSingleSessionEvent(event)) ||
+        (isMultiSessionEvent(firstEvent) &&
+        isMultiSessionEvent(event))
+      ) {
+        return "If you choose a single-session event, the second event must be a 2-session event";
+      }
     }
 
     return null;
@@ -326,16 +354,16 @@ export default function RegisterPage() {
     events: selectedEvents.map((event) => {
       const team = teamData[event.event_name];
 
-      if (event.event_type === "team") {
-        return {
-          event_name: event.event_name,
+      return {
+        event_name: event.event_name,
+        ...(event.isBoth && { session: team.session }),
+
+        ...(event.event_type === "team" && {
           role: team?.role === "leader" ? "lead" : "member",
           ...(team?.role === "leader" && { team_name: team.teamName }),
           ...(team?.role === "member" && { team_code: team.teamCode }),
-        };
-      }
-
-      return { event_name: event.event_name };
+        }),
+      };
     }),
   });
 
@@ -343,10 +371,12 @@ export default function RegisterPage() {
   const handleRegisterAndPay = async () => {
     try {
       if (!validate()) return;
+
       if (!food) {
         toast.warn("Please select food preference");
         return;
       }
+
       for (const event of selectedEvents) {
         if (event.event_type === "team") {
           const team = teamData[event.event_name];
@@ -508,10 +538,30 @@ export default function RegisterPage() {
 
     const data = buildRegistrationData();
 
-    try {
-      const response = await axios.post("/api/register", data);
+    setLoading(true);
 
-      if (response.status === 201) {
+    try {
+      const response = await axios.post("/api/register", data,{
+        responseType: "blob" 
+      });
+
+      if (response.status === 200) {
+        const blob = new Blob([response.data], {
+          type: "application/pdf"
+        });
+
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "COGNEBULA_Receipt.pdf";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        window.URL.revokeObjectURL(url);
+
         doBarrelRoll();
         setTimeout(() => setShowPopup(true), 400);
       }
@@ -519,6 +569,8 @@ export default function RegisterPage() {
     } catch (error) {
       console.error("Error register", error);
       toast.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -684,7 +736,8 @@ export default function RegisterPage() {
                     setTeamName={setTeamName}
                     setTeamCode={setTeamCode}
                     gradient={group.gradient}
-                    isSoloOnlyEvent={isSoloOnlyEvent}
+                    getSelectedSessions={getSelectedSessions}
+                    setTeamData={setTeamData}
                   />
                 ))}
               </div>
@@ -702,7 +755,7 @@ export default function RegisterPage() {
                   selectedEvents.map((event) => (
                     <div key={event.event_name} className={styles.summaryItem}>
                       <span>{event.event_name}</span>
-                      <span className={styles.price}>₹{event.event_mode === "workshop" ? "300" : "200"}</span>
+                      <span className={styles.price}>{event.event_mode === "workshop" ? "₹ 300" : ""}</span>
                     </div>
                   ))
                 )}
@@ -760,14 +813,16 @@ export default function RegisterPage() {
             </div>
 
             <div className={styles.infoCard}>
-              <AlertCircle size={20} />
-              <h4>Important Notes</h4>
+              <div className="flex items-center gap-4 text-red-400">
+                <AlertCircle size={20} />
+                <h4>Important Notes</h4>
+              </div>
               <ul>
                 <li>Maximum 2 events per participant</li>
                 <li>2nd event participation is based on time availability</li>
                 <li>Workshop / Hack Quest must be selected alone</li>
                 <li>Food preference is mandatory</li>
-                <li>Team codes are required for team events <br />(Team code will be mail to Tead Leader)</li>
+                <li>Team codes are required for team events <br />(Team code will be mailed to Tead Leader)</li>
               </ul>
             </div>
           </div>

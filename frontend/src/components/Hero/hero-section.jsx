@@ -120,7 +120,7 @@ export default function HeroSection() {
           <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#CEA2FD]" />
 
           {/* Content */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center">
             <img
               src={logo}
               alt="Velammal Engineering College"
@@ -135,7 +135,10 @@ export default function HeroSection() {
                 ENGINEERING COLLEGE
               </p>
               <p className="text-[0.65rem] text-[#B6B5D8]/80 italic">
-                Autonomous Institution
+                The Wheel of Knowledge rolls on!
+              </p>
+              <p className="text-[0.65rem] text-[#B6B5D8]/80 italic">
+                (Autonomous Institution)
               </p>
             </div>
           </div>
@@ -251,25 +254,25 @@ export default function HeroSection() {
           >
             <div className="space-y-3 md:space-y-4">
               <div className="flex items-center justify-center lg:justify-start mb-6 lg:hidden">
-                <div className="flex items-center gap-3 px-5 py-3 rounded-full 
+                <div className="flex flex-col items-center gap-3 px-5 py-3 rounded-3xl 
                                 bg-white/5 backdrop-blur-md border border-white/10 
                                 shadow-lg hover:scale-[1.02] transition-all duration-300">
 
                   <img
                     src={logo}
                     alt="Velammal Engineering College"
-                    className="w-10 md:w-12 h-auto object-contain"
+                    className="w-18 md:w-12 h-auto object-contain"
                   />
 
                   <div className="leading-tight">
-                    <p className="text-xs md:text-sm font-semibold tracking-wider text-[#CEA2FD]">
+                    <p className="text-[0.5rem] md:text-sm font-semibold tracking-wider text-[#CEA2FD]">
                       VELAMMAL ENGINEERING COLLEGE
                     </p>
-                    <p className="text-[0.65rem] md:text-xs text-[#B6B5D8] italic text-center">
+                    <p className="text-[0.45rem] md:text-xs text-[#B6B5D8] italic text-center">
                       The Wheel of Knowledge rolls on!
                     </p>
-                    <p className="text-[0.65rem] md:text-xs text-[#B6B5D8] italic text-center">
-                      Autonomous Institution
+                    <p className="text-[0.45rem] md:text-xs text-[#B6B5D8] italic text-center">
+                      (Autonomous Institution)
                     </p>
                   </div>
 
