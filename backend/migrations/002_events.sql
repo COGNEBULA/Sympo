@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS events (
   max_online_teams INTEGER NOT NULL,
 
   -- session
-  isboth BOOLEAN
+  is_both BOOLEAN
 );
 
 INSERT INTO events (
@@ -28,7 +28,7 @@ INSERT INTO events (
   teammembers,
   max_teams,
   max_online_teams,
-  isBoth
+  is_Both
 )
 VALUES
 
