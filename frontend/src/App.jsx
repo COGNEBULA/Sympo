@@ -1,25 +1,42 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Footer from "./components/Footer/Footer.jsx";
 import HeroSection from "./components/Hero/hero-section.jsx";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar/Navbar";
 import Highlight from "./components/Highlight/Highlight";
 import Event from "./components/Event/Event";
 import Contact from "./components/Contact/Contact";
-import Eventland from "./components/Event/Eventlanding";
 import Prize from "./components/Prize/prize.jsx";
 
 import CategoryPage from "./components/Event/CategoryPage";
 import AppBackground from "./components/Background/Background.jsx";
 import EventTimeline from "./components/Timeline/eventTimeline.jsx";
 import Scanner from "./components/QR Scanner/Scanner.jsx";
-import NotFound from "./components/404/notfound.jsx";
-import RegisterGate from "./components/Register/RegisterGateWay.jsx";
+import NotFound from "./components/404/NotFound.jsx";
 import Organizer from "./components/Organizer/Organizer.jsx";
+import Eventlanding from "./components/Event/Eventlanding.jsx";
+import RegistrationStartsSoon from "./components/Register/RegisterStartsSoon.jsx";
 
 
 const App = () => { 
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.hash) return;
+
+    // Small delay to ensure DOM is ready
+    const timeout = setTimeout(() => {
+      const element = document.querySelector(location.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [location]);
+  
   return (
     <>
       <AppBackground>
@@ -44,11 +61,11 @@ const App = () => {
           <Route path="/events/:category" element={<CategoryPage />} />
           <Route
             path="/event/:category/:id"
-            element={<Eventland />}
+            element={<Eventlanding />}
           />
             <Route
             path="/register"
-            element={<RegisterGate />}
+            element={<RegistrationStartsSoon />}
           />
           <Route
             path="/prize"
