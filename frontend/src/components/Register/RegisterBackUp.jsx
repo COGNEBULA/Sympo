@@ -421,8 +421,45 @@ export default function RegisterPage() {
 
   const handleManualPayment = async () => {
     if (!txnId || !paymentScreenshot) {
-        toast.error("Transaction ID & screenshot required");
-        return;
+      toast.error("Transaction ID & screenshot required");
+      return;
+    }
+      
+    if (!validate()) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    
+    
+    if (!food) {
+      toast.warn("Please select food preference");
+      return;
+    }
+    
+    for (const event of selectedEvents) {
+      if (event.event_type === "team") {
+        const team = teamData[event.event_name];
+        
+        if (!team || !team.role) {
+          toast.error(`Select team role for ${event.event_name}`);
+          return;
+        }
+        
+        if (team.role === "leader" && !team.teamName?.trim()) {
+          toast.error(`Enter team name for ${event.event_name}`);
+          return;
+        }
+        
+        if (team.role === "member" && !team.teamCode?.trim()) {
+          toast.error(`Enter team code for ${event.event_name}`);
+          return;
+        }
+      }
+    }
+    
+    if (selectedEvents.length === 0) {
+      toast.warn("Please select at least one event");
+      return;
     }
 
     let extractedUid = null;
@@ -469,43 +506,6 @@ export default function RegisterPage() {
     formData.append("screenshot", paymentScreenshot);
     formData.append("rawUid", extractedUid)
     formData.append("events", JSON.stringify(buildRegistrationData().events));
-
-    if (!validate()) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-    
-    
-    if (!food) {
-      toast.warn("Please select food preference");
-      return;
-    }
-    
-    for (const event of selectedEvents) {
-      if (event.event_type === "team") {
-        const team = teamData[event.event_name];
-        
-        if (!team || !team.role) {
-          toast.error(`Select team role for ${event.event_name}`);
-          return;
-        }
-        
-        if (team.role === "leader" && !team.teamName?.trim()) {
-          toast.error(`Enter team name for ${event.event_name}`);
-          return;
-        }
-        
-        if (team.role === "member" && !team.teamCode?.trim()) {
-          toast.error(`Enter team code for ${event.event_name}`);
-          return;
-        }
-      }
-    }
-    
-    if (selectedEvents.length === 0) {
-        toast.warn("Please select at least one event");
-        return;
-      }
       try {
         setLoading(true);
         
@@ -937,7 +937,7 @@ export default function RegisterPage() {
 
                     {/* SCREENSHOT UPLOAD */}
                     <div className={styles.formGroup}>
-                        <label>Upload Payment Screenshot</label>
+                        <label className="p-4">Upload the payment screenshot clearly showing the transaction ID. In case of any mismatch, our team will contact you for verification and payment settlement.</label>
                         <input
                             type="file"
                             accept="image/*"
