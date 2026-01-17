@@ -1,0 +1,124 @@
+.container {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 25px;
+  padding: 14px 0;
+  border-radius: 8px;
+}
+
+.link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 15px;
+  font-size: 16px;
+  /* Add your existing styles */
+}
+
+.link.active {
+  border-bottom: 2px solid #007bff; /* Or your brand color */
+  font-weight: bold;
+}
+
+.link:hover {
+  color: #60a5fa;
+}
+
+.heading {
+  margin-bottom: 15px;
+  text-align: center;
+  color: white;
+  font-weight: 700;
+  font-size: xx-large;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 15px;
+}
+
+.searchBox {
+  flex: 1;
+  padding: 10px 12px;
+  max-width: 450px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 15px;
+  color: white;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.table th {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.table tr:hover {
+  background-color: #f1f5f9;
+}
+
+button {
+  padding: 10px 22px;
+  background-color: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  /* background-color: #15803d; */
+}
+
+button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pagination button {
+  background-color: #e5e7eb;
+  color: #111827;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.activePage {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
