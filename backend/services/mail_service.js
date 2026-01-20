@@ -9,38 +9,25 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendWelcomeMail(receipt) {
-
   const {
     receipt_id,
     participant,
     events,
-    food
+    food,
   } = receipt;
 
   const { name, email } = participant;
-  const { qr_buffer } = food;
-  const foodType = food.type;
 
-  const eventsHtml = events.map(ev => {
-    let extra = "";
-
-    if (ev.role === "lead") {
-      extra = `
-        <div><b>Team Name:</b> ${ev.team_name}</div>
-        <div><b>Team Code:</b> ${ev.team_code}</div>
-      `;
-    } else if (ev.role === "member") {
-      extra = `<div><b>Team Name:</b> ${ev.team_name}</div>`;
-    }
-
-    return `
-      <div class="event-card">
-        <h4>${ev.event_name}</h4>
-        <div><b>Role:</b> ${ev.role}</div>
-        ${extra}
-      </div>
-    `;
-  }).join("");
+  /* 🎯 Event cards (simple list now) */
+  const eventsHtml = events
+    .map(
+      (eventName) => `
+        <div class="event-card">
+          <h4>${eventName}</h4>
+        </div>
+      `
+    )
+    .join("");
 
   await transporter.sendMail({
     from: `"COGNEBULA 26 🚀" <${process.env.MAIL_USER}>`,
@@ -128,7 +115,7 @@ async function sendWelcomeMail(receipt) {
   }
 
   .event-card h4 {
-    margin: 0 0 6px;
+    margin: 0;
     color: #e0c3ff;
   }
 
@@ -164,12 +151,6 @@ async function sendWelcomeMail(receipt) {
     border-radius: 14px;
   }
 
-  .food img {
-    margin-top: 15px;
-    border-radius: 12px;
-    border: 3px solid #8e2de2;
-  }
-
   .footer {
     margin-top: 30px;
     font-size: 13px;
@@ -187,9 +168,11 @@ async function sendWelcomeMail(receipt) {
         <h1>COGNEBULA 26</h1>
         <p>Where Innovation Meets Intelligence 🌌</p>
         <div class="badge">REGISTRATION CONFIRMED</div>
-        <div class="receipt-id">
-          🎫 Receipt ID: <b>${receipt_id}</b>
-        </div>
+        ${
+          receipt_id
+            ? `<div class="receipt-id">🎫 Receipt ID: <b>${receipt_id}</b></div>`
+            : ""
+        }
       </div>
 
       <div class="content-text">
@@ -204,26 +187,21 @@ async function sendWelcomeMail(receipt) {
       <div class="rules">
         <h3>⚠️ Important Instructions</h3>
         <ul>
+          <li>🪪 <b>College ID Card is mandatory.</b></li>
+          <li>⏳ <b>Second event participation is subject to time availability.</b></li>
           <li>
-            🪪 <b>College ID Card is mandatory.</b>  
-            Entry will not be permitted without a valid ID.
-          </li>
-          <li>
-            ⏳ <b>Second event participation is subject to time availability.</b>  
-            Please plan your schedule accordingly.
-          </li>
-          <li>
-            📝 <b>Please note that this confirmation email is provisional and subject to manual verification of your payment. If there are any discrepancies, our registration team will contact you before the symposium. In the event of a verification issue, you will need to settle the amount or provide clarification on the day of the event.</b>
+            📝 <b>
+            This confirmation is provisional and subject to manual payment verification.
+            In case of any discrepancy, the registration team will contact you.
+            </b>
           </li>
         </ul>
       </div>
 
       <div class="food">
-        <h3>🍽️ Food Pass – ${foodType.toUpperCase()}</h3>
-        <div>Show this QR code at the food counter.</div>
-        <div><b>One-time use only</b></div>
-
-        <img src="cid:foodqr" width="200" alt="Food QR Code"/>
+        <h3>🍽️ Food Pass</h3>
+        <div><b>${food.toUpperCase()}</b></div>
+        <div>(Show this at the food counter)</div>
       </div>
 
       <div class="footer">
@@ -237,13 +215,6 @@ async function sendWelcomeMail(receipt) {
 </body>
 </html>
 `,
-    attachments: [
-      {
-        filename: "food_qr.png",
-        content: qr_buffer,
-        cid: "foodqr",
-      },
-    ],
   });
 }
 

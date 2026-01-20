@@ -2,14 +2,6 @@ const { getClient } = require("../config/db");
 
 const { sendWelcomeMail } = require("../services/mail_service");
 const { appendToGoogleSheet } = require("../services/excel_service");
-const { resolveTeamRegistration } = require("../services/team_service");
-const { generateReceiptPDF } = require("../services/pdf_service");
-
-const {
-  generateFoodToken,
-  generateFoodQRBuffer
-} = require("../helpers/qr_helper");
-
 const { buildReceiptData } = require("../helpers/receipt_helper");
 
 const {
@@ -17,291 +9,110 @@ const {
   ConflictError
 } = require("../errors/error");
 
-
-/* ===============================
-   REGISTER CONTROLLER
-=============================== */
-async function register(req, res, next) {
-  const client = await getClient(); // 🔐 single DB connection
-  let email;
+exports.createRegistration = async (req, res, next) => {
+  const client = await getClient();
 
   try {
     /* ===============================
-       BEGIN TRANSACTION
+       HANDLE SINGLE TEXT JSON INPUT
     =============================== */
-    await client.query("BEGIN");
+    if (req.body.data) {
+      try {
+        req.body = JSON.parse(req.body.data);
+      } catch {
+        throw new ValidationError("Invalid JSON in data field");
+      }
+    }
 
     const {
       name,
-      email: reqEmail,
       phone,
+      email,
       college,
       student_year,
-      food,
       events,
-      registration_mode,
+      food,
+      transaction_id
     } = req.body;
 
-    email = reqEmail;
-
-    /* ===============================
-       BASIC VALIDATION
-    =============================== */
-    if (!name || !email || !phone || !college || !student_year || !food) {
-      throw ValidationError("Missing registration details");
+    /* 🔍 Validations */
+    if (!name || !phone || !email || !college || !student_year || !food) {
+      throw new ValidationError("Missing required fields");
     }
 
     if (!Array.isArray(events) || events.length === 0) {
-      throw ValidationError("Select at least one event");
+      throw new ValidationError("At least one event is required");
     }
 
-    if (!["online", "onspot"].includes(registration_mode)) {
-      throw ValidationError("Invalid registration mode");
+    if (!req.file) {
+      throw new ValidationError("Payment screenshot is required");
     }
 
-    /* ===============================
-// if (!utr) {
-//   throw ValidationError("UTR is required");
-// }
+    await client.query("BEGIN");
 
-// if (!/^[0-9A-Za-z]{6,50}$/.test(utr)) {
-//   throw ValidationError("Invalid UTR format");
-// }
-
-    /* ===============================
-       SLOT RESERVATION CHECK (NEW)
-    =============================== */
-    const reservationRes = await client.query(
-      `SELECT * FROM slot_reservations WHERE email = $1`,
+    /* 🚫 Duplicate email check */
+    const duplicate = await client.query(
+      "SELECT id FROM registrations WHERE email = $1",
       [email]
     );
 
-    if (reservationRes.rowCount === 0) {
-      throw ConflictError("Reservation expired. Please retry.");
+    if (duplicate.rowCount > 0) {
+      throw new ConflictError("Email already registered");
     }
 
-    if (reservationRes.rowCount !== events.length) {
-      throw ConflictError("Reservation mismatch. Please retry.");
-    }
+    /* 💾 Insert registration */
+    const insertQuery = `
+      INSERT INTO registrations (
+        name,
+        phone,
+        email,
+        college,
+        student_year,
+        events,
+        food,
+        transaction_id,
+        screenshot_path
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      RETURNING *
+    `;
 
-    /* ===============================
-       EMAIL DUPLICATE CHECK
-    =============================== */
-    const emailExists = await client.query(
-      `SELECT 1 FROM registrations WHERE email = $1`,
-      [email]
-    );
-
-    if (emailExists.rowCount > 0) {
-      throw ConflictError("Email already registered");
-    }
-
-    const proofRes = await client.query(
-      `SELECT uid, screenshot_hash, screenshot_path,is_verified FROM payment_proofs WHERE email = $1`,
-      [email]
-    );
-
-    if (proofRes.rowCount === 0) {
-      throw ConflictError("Payment proof not found");
-    }
-
-    const { uid: utr, screenshot_hash, screenshot_path, is_verified } = proofRes.rows[0];
-
-    const utrExists = await client.query(
-      `SELECT 1 FROM registrations WHERE utr = $1`,
-      [utr]
-    );
-
-    const screenshotExists = await client.query(
-      `SELECT 1 FROM registrations WHERE screenshot_hash = $1`,
-      [screenshot_hash]
-    );
-
-    if (utrExists.rowCount > 0 || screenshotExists.rowCount > 0) {
-      throw ConflictError("UTR already used");
-    }
-
-   const regRes = await client.query(
-      `INSERT INTO registrations
-      (name, email, phone, college, student_year, food, utr, screenshot_hash)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-      RETURNING id`,
-      [name, email, phone, college, student_year, food, utr, screenshot_hash]
-    );
-
-
-    const registrationId = regRes.rows[0].id;
-    const responseEvents = [];
-
-    /* ===============================
-       PROCESS EVENTS
-    =============================== */
-    for (const ev of events) {
-      const { event_name } = ev;
-
-      const eventRes = await client.query(
-        `SELECT id, event_type, teammembers
-         FROM events WHERE event_name = $1`,
-        [event_name]
-      );
-
-      if (eventRes.rowCount === 0) {
-        throw ValidationError(`Invalid event: ${event_name}`);
-      }
-
-      const event = eventRes.rows[0];
-
-      /* -------------------------------
-         MATCH RESERVATION
-      ------------------------------- */
-      const reservation = reservationRes.rows.find(
-        r => r.event_id === event.id
-      );
-
-      if (!reservation) {
-        throw ConflictError(`Reservation mismatch for ${event_name}`);
-      }
-
-      /* -------------------------------
-         TEAM LOGIC (UNCHANGED)
-      ------------------------------- */
-      const {
-        finalRole,
-        finalTeamName,
-        finalTeamCode
-      } = await resolveTeamRegistration({
-        client,
-        event,
-        role: reservation.role,
-        team_name: reservation.team_name,
-        team_code: reservation.team_code
-      });
-
-      await client.query(
-        `INSERT INTO registration_events
-        (registration_id, event_id, role, team_name, team_code, session, registration_mode)
-        VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-        [
-          registrationId,
-          event.id,
-          finalRole,
-          finalTeamName,
-          finalTeamCode,
-          reservation.session || null,
-          registration_mode
-        ]
-      );
-
-
-      responseEvents.push({
-        event_name,
-        role: finalRole || "participant",
-        team_name: finalTeamName,
-        team_code: finalTeamCode
-      });
-    }
-
-    // update the payment proof 
-
-    await client.query(`UPDATE payment_proofs
-      SET status = 'SUCCESS'
-      WHERE uid = $1;
-      `, [utr])
-
-    /* ===============================
-       FOOD TOKEN
-    =============================== */
-    const foodToken = generateFoodToken();
-
-    await client.query(
-      `INSERT INTO food_tokens (registration_id, token, food_type)
-       VALUES ($1,$2,$3)`,
-      [registrationId, foodToken, food]
-    );
-
-    /* ===============================
-       COMMIT TRANSACTION
-    =============================== */
-    await client.query("COMMIT");
-
-    /* ===============================
-       SIDE EFFECTS (POST COMMIT)
-    =============================== */
-    const qrBuffer = await generateFoodQRBuffer(foodToken);
-
-    const receipt = buildReceiptData({
-      registrationId,
+    const values = [
       name,
-      email,
       phone,
+      email,
       college,
       student_year,
+      events,
       food,
-      events: responseEvents,
-      foodToken,
-      qrBuffer
+      transaction_id || null,
+      req.file.path
+    ];
+
+    const { rows } = await client.query(insertQuery, values);
+    const registration = rows[0];
+
+    /* 🧾 Build receipt */
+    const receiptData = await buildReceiptData(registration);
+
+    /* 📧 Send mail */
+    await sendWelcomeMail(receiptData);
+
+    /* 📊 Append Google Sheet */
+    await appendToGoogleSheet(registration);
+
+    await client.query("COMMIT");
+
+    res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      data: registration
     });
-
-    sendWelcomeMail(receipt).catch(console.error);
-
-    const normalizedPath = screenshot_path.replace(/\\/g, "/");
-    const screenshot = `${process.env.BASE_URL}${normalizedPath}`;
-    const participantID = `COG26-${registrationId}`
-
-    appendToGoogleSheet({
-      participantID,
-      name,
-      email,
-      phone,
-      college,
-      year: student_year,
-      events: responseEvents.map(e => e.event_name).join(", "),
-      food,
-      utr,
-      screenshot_path: screenshot,
-      is_verified
-    }).catch(console.error);
-
-    /* ===============================
-       CLEAR RESERVATION
-    =============================== */
-    await client.query(
-      `DELETE FROM slot_reservations WHERE email = $1`,
-      [email]
-    );
-
-
-    const pdfBuffer = await generateReceiptPDF(receipt);
-
-    // return res.status(201).json({
-    //   success: true,
-    //   receipt,
-    //   pdf_base64: pdfBuffer.toString("base64")
-    //  pdf_base64: pdfBuffer.toString("base64")
-    // });
-
-    res.set({
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename=COGNEBULA_${receipt.receipt_id}.pdf`,
-      "Content-Length": pdfBuffer.length
-    });
-
-    return res.status(200).send(pdfBuffer);
 
   } catch (err) {
     await client.query("ROLLBACK");
-
-    // if (email) {
-    //   await client.query(
-    //     `DELETE FROM slot_reservations WHERE email = $1`,
-    //     [email]
-    //   );
-    // }
-
     next(err);
   } finally {
     client.release();
   }
-}
-
-module.exports = { register };
+};

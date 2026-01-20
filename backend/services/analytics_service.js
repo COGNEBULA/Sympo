@@ -1,4 +1,4 @@
-const { getClient } = require("../config/db");
+const { getClient } = require("../../new backend/config/db");
 
 async function getAdminAnalytics(date) {
   const client = await getClient();

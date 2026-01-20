@@ -1,17 +1,23 @@
 CREATE TABLE IF NOT EXISTS registrations (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(150) UNIQUE NOT NULL,  
-  secondmail VARCHAR(150) UNIQUE,
-  phone VARCHAR(15) NOT NULL,
-  college VARCHAR(150) NOT NULL,
-  student_year INTEGER NOT NULL,
-  amount INTEGER,
-  food VARCHAR(50) NOT NULL,
-  utr BIGINT UNIQUE NOT NULL,
-  screenshot_hash TEXT UNIQUE NOT NULL
-);
+    id SERIAL PRIMARY KEY,
 
-ALTER TABLE registrations
-ADD COLUMN IF NOT EXISTS blacklist BOOLEAN DEFAULT FALSE;
-ADD COLUMN IF NOT EXISTS checkin BOOLEAN DEFAULT FALSE;
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+
+    college VARCHAR(150) NOT NULL,
+    student_year INTEGER NOT NULL,
+
+    events TEXT[] NOT NULL,   -- array of events
+
+    food VARCHAR(50) NOT NULL,
+
+    transaction_id BIGINT,
+
+    screenshot_path TEXT UNIQUE NOT NULL,
+
+    second_email VARCHAR(150) UNIQUE,
+
+    checkin BOOLEAN DEFAULT FALSE,
+    blacklist BOOLEAN DEFAULT FALSE
+);

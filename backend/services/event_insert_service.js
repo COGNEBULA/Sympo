@@ -1,4 +1,4 @@
-const { getClient } = require("../config/db");
+const { getClient } = require("../../new backend/config/db");
 
 async function registerParticipantsToEventService(role, participant_ids, team_name) {
   const client = await getClient();

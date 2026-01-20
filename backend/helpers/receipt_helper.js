@@ -1,39 +1,13 @@
-const { bufferToBase64 } = require("./qr_helper")
-
-function buildReceiptData({
-  registrationId,
-  name,
-  email,
-  phone,
-  college,
-  student_year,
-  food,
-  events,
-  foodToken,
-  qrBuffer
-}) {
+exports.buildReceiptData = async (row) => {
   return {
-    receipt_id: `COG26-${registrationId}`,
-
     participant: {
-      name,
-      email,
-      phone,
-      college,
-      year: student_year
+      name: row.name,
+      email: row.email,
+      college: row.college,
+      student_year: row.student_year
     },
-
-    events,
-
-    food: {
-      type: food,
-      token: foodToken,
-      qr_base64: `data:image/png;base64,${bufferToBase64(qrBuffer)}`, // For pdf in Frontend 
-      qr_buffer: qrBuffer // For mail
-    },
-
-    generated_at: new Date().toISOString()
+    events: row.events,
+    food: row.food,
+    transaction_id: row.transaction_id
   };
-}
-
-module.exports = {buildReceiptData}
+};
