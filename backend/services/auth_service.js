@@ -1,4 +1,4 @@
-const { getClient } = require("../../new backend/config/db");
+const { getClient } = require("../config/db");
 const AppError = require("../errors/error");
 
 exports.loginUser = async (email, dob) => {

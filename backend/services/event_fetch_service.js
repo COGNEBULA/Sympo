@@ -1,4 +1,4 @@
-const { getClient } = require("../../new backend/config/db");
+const { getClient } = require("../config/db");
 
 async function fetchCoordinatorParticipants(role) {
   const client = await getClient();
