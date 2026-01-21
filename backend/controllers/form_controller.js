@@ -31,12 +31,14 @@ exports.createRegistration = async (req, res, next) => {
       college,
       student_year,
       events,
+      teamname,
       food,
       transaction_id
     } = req.body;
-
+    console.log(req.body);
+    console.log(name, phone, email, college, student_year, events, teamname, food, transaction_id);
     /* 🔍 Validations */
-    if (!name || !phone || !email || !college || !student_year || !food) {
+    if (!name || !phone || !email || !college || !student_year || !food || !teamname) {
       throw new ValidationError("Missing required fields");
     }
 
@@ -69,11 +71,12 @@ exports.createRegistration = async (req, res, next) => {
         college,
         student_year,
         events,
+        teamname,
         food,
         transaction_id,
         screenshot_path
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
       RETURNING *
     `;
 
@@ -84,6 +87,7 @@ exports.createRegistration = async (req, res, next) => {
       college,
       student_year,
       events,
+      teamname,
       food,
       transaction_id || null,
       req.file.path

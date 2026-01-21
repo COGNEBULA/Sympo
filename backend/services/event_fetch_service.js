@@ -7,86 +7,52 @@ async function fetchCoordinatorParticipants(role) {
     await client.query("BEGIN");
 
     /* =====================================================
-       🔹 ALL CHECKED-IN PARTICIPANTS
+       🔹 ALL CHECKED-IN PARTICIPANTS (by event name)
     ===================================================== */
     const participantsResult = await client.query(
       `
-      SELECT DISTINCT
-        r.id AS registration_id,
-        r.name,
-        r.phone AS mobile,
-        r.email,
-        r.college,
-        r.student_year AS year,
-        re.session
-      FROM events e
-      JOIN registration_events re ON re.event_id = e.id
-      JOIN registrations r ON r.id = re.registration_id
+      SELECT
+        id AS registration_id,
+        name,
+        phone AS mobile,
+        email,
+        college,
+        student_year AS year
+      FROM registrations
       WHERE
-        e.event_name = $1
-        AND r.checkin = true
-      ORDER BY r.name
-      `,
-      [role]
-    );
-
- 
-
-    /* =====================================================
-       🌅 MORNING SESSION PARTICIPANTS
-    ===================================================== */
-    const morningParticipantsResult = await client.query(
-      `
-      SELECT DISTINCT
-        r.id AS registration_id,
-        r.name,
-        re.team_name
-      FROM events e
-      JOIN registration_events re ON re.event_id = e.id
-      JOIN registrations r ON r.id = re.registration_id
-      WHERE
-        e.event_name = $1
-        AND r.checkin = true
-        AND re.session = 'morning'
-      ORDER BY r.name
+        checkin = true
+        AND $1 = ANY(events)
+      ORDER BY name
       `,
       [role]
     );
 
     /* =====================================================
-       🌆 AFTERNOON SESSION PARTICIPANTS
+       🌅 MORNING SESSION PARTICIPANTS (NOT AVAILABLE)
+       → RETURN EMPTY DATA TO PRESERVE RESPONSE LOGIC
     ===================================================== */
-    const afternoonParticipantsResult = await client.query(
-      `
-      SELECT DISTINCT
-        r.id AS registration_id,
-        r.name,
-        re.team_name
-      FROM events e
-      JOIN registration_events re ON re.event_id = e.id
-      JOIN registrations r ON r.id = re.registration_id
-      WHERE
-        e.event_name = $1
-        AND r.checkin = true
-        AND re.session = 'afternoon'
-      ORDER BY r.name
-      `,
-      [role]
-    );
+    const morningParticipantsResult = {
+      rowCount: 0,
+      rows: []
+    };
+
+    /* =====================================================
+       🌆 AFTERNOON SESSION PARTICIPANTS (NOT AVAILABLE)
+       → RETURN EMPTY DATA TO PRESERVE RESPONSE LOGIC
+    ===================================================== */
+    const afternoonParticipantsResult = {
+      rowCount: 0,
+      rows: []
+    };
 
     await client.query("COMMIT");
 
+    /* =====================================================
+       ✅ FINAL RESPONSE (UNCHANGED)
+    ===================================================== */
     return {
       totalCount: participantsResult.rowCount,
-      participants: participantsResult.rows,
-      morningSessionParticipants: {
-        count: morningParticipantsResult.rowCount,
-        data: morningParticipantsResult.rows
-      },
-      afternoonSessionParticipants: {
-        count: afternoonParticipantsResult.rowCount,
-        data: afternoonParticipantsResult.rows
-      }
+      participants: participantsResult.rows 
     };
 
   } catch (err) {

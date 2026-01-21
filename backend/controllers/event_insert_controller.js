@@ -6,16 +6,16 @@ const {
  * POST /api/coordinator/register-participant
  * Body:
  * {
- *   "participant_ids": number[],
- *   "team_name": string | null
+ *   "participant_ids": "18" | "18,19,20",
+ *   "team_name": "HAri" | ""
  * }
  */
 async function registerParticipantToEvent(req, res, next) {
   try {
-    const role = req.session?.user.role;
+    const role = req.session?.user?.role;
     let { participant_ids, team_name } = req.body;
 
-    // Normalize empty string to NULL
+    // Normalize empty string to null
     team_name =
       typeof team_name === "string" && team_name.trim() === ""
         ? null
@@ -28,10 +28,10 @@ async function registerParticipantToEvent(req, res, next) {
       });
     }
 
-    if (!Array.isArray(participant_ids) || participant_ids.length === 0) {
+    if (!participant_ids || typeof participant_ids !== "string") {
       return res.status(400).json({
         success: false,
-        message: "participant_ids must be a non-empty array"
+        message: "participant_ids must be a string"
       });
     }
 

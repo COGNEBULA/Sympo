@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS registrations (
     student_year INTEGER NOT NULL,
 
     events TEXT[] NOT NULL,   -- array of events
-
+    teamname TEXT[] NOT NULL,
     food VARCHAR(50) NOT NULL,
 
     transaction_id BIGINT,

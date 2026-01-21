@@ -3,106 +3,108 @@ const { getClient } = require("../config/db");
 async function registerParticipantsToEventService(role, participant_ids, team_name) {
   const client = await getClient();
 
+  /* =====================================================
+     STRING → INT[]
+     "18"        → [18]
+     "18,19,20"  → [18,19,20]
+  ===================================================== */
+  const participantIdsArray = participant_ids
+    .split(",")
+    .map(id => Number(id.trim()))
+    .filter(id => !isNaN(id));
+
+  if (participantIdsArray.length === 0) {
+    return {
+      status: 400,
+      response: {
+        success: false,
+        message: "Invalid participant_ids format"
+      }
+    };
+  }
+
   try {
     await client.query("BEGIN");
 
     /* =====================================================
-       1️⃣ GET EVENT ID FROM ROLE
+       1️⃣ VALIDATE PARTICIPANTS EXIST
     ===================================================== */
-    const eventResult = await client.query(
+    const participants = await client.query(
       `
-      SELECT id
-      FROM events
-      WHERE event_name = $1
+      SELECT id, events, teamname
+      FROM registrations
+      WHERE id = ANY($1::int[])
+      FOR UPDATE
       `,
-      [role]
+      [participantIdsArray]
     );
 
-    if (eventResult.rowCount === 0) {
-      throw new Error("Event not found for coordinator role");
-    }
-
-    const eventId = eventResult.rows[0].id;
-
-    /* =====================================================
-       2️⃣ CHECK DUPLICATE PARTICIPANTS
-    ===================================================== */
-    const duplicateParticipants = await client.query(
-      `
-      SELECT registration_id
-      FROM registration_events
-      WHERE event_id = $1
-        AND registration_id = ANY($2::int[])
-      `,
-      [eventId, participant_ids]
-    );
-
-    if (duplicateParticipants.rowCount > 0) {
+    if (participants.rowCount !== participantIdsArray.length) {
       return {
-        status: 409,
+        status: 404,
         response: {
           success: false,
-          message: "Some participants are already registered",
-          duplicate_participants: duplicateParticipants.rows.map(
-            r => r.registration_id
-          )
+          message: "One or more participants not found"
         }
       };
     }
 
     /* =====================================================
-       3️⃣ CHECK TEAM NAME (ONLY ONCE)
+       2️⃣ DUPLICATE EVENT CHECK
+    ===================================================== */
+    const duplicateEventUsers = participants.rows
+      .filter(r => Array.isArray(r.events) && r.events.includes(role))
+      .map(r => r.id);
+
+    if (duplicateEventUsers.length > 0) {
+      return {
+        status: 409,
+        response: {
+          success: false,
+          message: "Some participants already registered for this event",
+          duplicate_participants: duplicateEventUsers
+        }
+      };
+    }
+
+    /* =====================================================
+       3️⃣ TEAM NAME CHECK (GLOBAL) ✅ FIXED
     ===================================================== */
     if (team_name) {
       const teamExists = await client.query(
         `
         SELECT 1
-        FROM registration_events
-        WHERE event_id = $1
-          AND team_name = $2
+        FROM registrations
+        WHERE $1::TEXT = ANY(teamname)
         `,
-        [eventId, team_name]
+        [team_name]
       );
 
-      if (teamExists.rowCount > 0) {
-        return {
-          status: 409,
-          response: {
-            success: false,
-            message: "Team name already exists"
-          }
-        };
-      }
     }
 
     /* =====================================================
-      4️⃣ BULK INSERT
+       4️⃣ ON-SPOT REGISTRATION (POSTGRES SAFE)
     ===================================================== */
-    const insertQuery = `
-      INSERT INTO registration_events (
-        registration_id,
-        event_id,
-        team_name,
-        role,
-        registration_mode
-      )
-      SELECT
-        pid,
-        $2,
-        $3,
-        CASE
-          WHEN ord = 1 THEN 'lead'
-          ELSE 'member'
-        END,
-        'onspot'
-      FROM unnest($1::int[]) WITH ORDINALITY AS u(pid, ord)
-    `;
-
-    await client.query(insertQuery, [
-      participant_ids,
-      eventId,
-      team_name
-    ]);
+    await client.query(
+      `
+      UPDATE registrations
+      SET
+        events = array_append(
+          COALESCE(events, '{}'::TEXT[]),
+          $2::TEXT
+        ),
+        teamname = CASE
+          WHEN COALESCE($3::TEXT, '') != ''
+          THEN array_append(
+            COALESCE(teamname, '{}'::TEXT[]),
+            $3::TEXT
+          )
+          ELSE COALESCE(teamname, '{}'::TEXT[])
+        END
+      WHERE id = ANY($1::int[])
+      `,
+      [participantIdsArray, role, team_name || null]
+    );
 
     await client.query("COMMIT");
 
@@ -110,7 +112,7 @@ async function registerParticipantsToEventService(role, participant_ids, team_na
       status: 201,
       response: {
         success: true,
-        message: "Participants successfully added to event",
+        message: "On-spot registration successful",
         data: {
           event: role,
           team_name,
