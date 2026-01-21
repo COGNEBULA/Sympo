@@ -53,7 +53,7 @@ async function getAdminAnalytics(date) {
     `);
 
     /* =====================================================
-       🚫 BLACKLISTED PARTICIPANTS (registrations only)
+       🚫 BLACKLISTED PARTICIPANTS
     ===================================================== */
 
     const blacklistResult = await client.query(`
@@ -69,31 +69,109 @@ async function getAdminAnalytics(date) {
       ORDER BY name
     `);
 
-    await client.query("COMMIT");
     /* =====================================================
-       🎯 EVENTS & WORKSHOP ANALYTICS (registrations only)
+       🎯 EVENTS & WORKSHOP ANALYTICS
     ===================================================== */
 
     const eventWorkshopCount = await client.query(`
       SELECT
-       COUNT(*) FILTER (
-      WHERE EXISTS (
-        SELECT 1 FROM unnest(events) e
-        WHERE e ILIKE '%workshop%'
-      )
-    )::INT AS workshop_count,
+        COUNT(*) FILTER (
+          WHERE EXISTS (
+            SELECT 1 FROM unnest(events) e
+            WHERE e ILIKE '%workshop%'
+          )
+        )::INT AS workshop_count,
 
-    COUNT(*) FILTER (
-      WHERE NOT EXISTS (
-        SELECT 1 FROM unnest(events) e
-        WHERE e ILIKE '%workshop%'
-      )
-    )::INT AS event_count
-  FROM registrations
-`);
+        COUNT(*) FILTER (
+          WHERE NOT EXISTS (
+            SELECT 1 FROM unnest(events) e
+            WHERE e ILIKE '%workshop%'
+          )
+        )::INT AS event_count
+      FROM registrations
+    `);
 
     /* =====================================================
-       🔁 DATA TRANSFORMATION (UNCHANGED)
+       🔁 MODE COUNTS
+    ===================================================== */
+
+    const techCountResult = await client.query(`
+      SELECT COUNT(*)::INT AS count
+      FROM registrations
+      WHERE events && ARRAY[
+        'Agent Fusion',
+        'Paper Podium',
+        'Prompt Craft',
+        'HackQuest',
+        'Query Clash',
+        'Shark Tank'
+      ]
+    `);
+    const techCount = techCountResult.rows[0].count;
+
+    const nonTechCountResult = await client.query(`
+      SELECT COUNT(*)::INT AS count
+      FROM registrations
+      WHERE events && ARRAY[
+        'Auction Arena',
+        'Flashback',
+        'Cinefrenzy',
+        'Battle of Thrones',
+        'Beyond the Gate',
+        'Rhythmia'
+      ]
+    `);
+    const nonTechCount = nonTechCountResult.rows[0].count;
+
+    const workshopCountResult = await client.query(`
+      SELECT COUNT(*)::INT AS count
+      FROM registrations
+      WHERE events @> ARRAY['Workshop']
+    `);
+    const workshopCount = workshopCountResult.rows[0].count;
+
+    /* =====================================================
+       📊 EVENT-WISE COUNTS (ADDED)
+    ===================================================== */
+
+    const techEventWise = await client.query(`
+      SELECT
+        e AS event_name,
+        COUNT(*)::INT AS count
+      FROM registrations,
+           unnest(events) AS e
+      WHERE e = ANY (ARRAY[
+        'Agent Fusion',
+        'Paper Podium',
+        'Prompt Craft',
+        'HackQuest',
+        'Query Clash',
+        'Shark Tank'
+      ])
+      GROUP BY e
+      ORDER BY count DESC
+    `);
+
+    const nonTechEventWise = await client.query(`
+      SELECT
+        e AS event_name,
+        COUNT(*)::INT AS count
+      FROM registrations,
+           unnest(events) AS e
+      WHERE e = ANY (ARRAY[
+        'Auction Arena',
+        'Flashback',
+        'Cinefrenzy',
+        'Battle of Thrones',
+        'Beyond the Gate',
+        'Rhythmia'
+      ])
+      GROUP BY e
+      ORDER BY count DESC
+    `);
+
+    /* =====================================================
+       🔁 DATA TRANSFORMATION
     ===================================================== */
 
     const totalFoodCount =
@@ -119,9 +197,10 @@ async function getAdminAnalytics(date) {
       count: row.count
     }));
 
+    await client.query("COMMIT");
 
     /* =====================================================
-       ✅ FINAL RESPONSE (LOGIC UNCHANGED)
+       ✅ FINAL RESPONSE
     ===================================================== */
 
     return {
@@ -131,18 +210,20 @@ async function getAdminAnalytics(date) {
         vegCount: vegCount.rows[0].count,
         nonVegCount: nonVegCount.rows[0].count,
         topColleges: formattedTopColleges,
-        yearWiseCount
+        yearWiseCount,
+        checkInCount: checkInCount.rows[0].count
       },
 
       events: {
         modeCounts: {
-          events: eventWorkshopCount.rows[0].event_count,
-          workshop: eventWorkshopCount.rows[0].workshop_count
+          nonTech: nonTechCount,
+          tech: techCount,
+          workshop: workshopCount
+        },
+        eventWise: {
+          nonTech: nonTechEventWise.rows,
+          tech: techEventWise.rows
         }
-      },
-
-      onDay: {
-        checkInCount: checkInCount.rows[0].count
       }
     };
 
