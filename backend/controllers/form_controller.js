@@ -35,8 +35,6 @@ exports.createRegistration = async (req, res, next) => {
       food,
       transaction_id
     } = req.body;
-    console.log(req.body);
-    console.log(name, phone, email, college, student_year, events, teamname, food, transaction_id);
     /* 🔍 Validations */
     if (!name || !phone || !email || !college || !student_year || !food || !teamname) {
       throw new ValidationError("Missing required fields");

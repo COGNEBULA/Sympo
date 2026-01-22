@@ -3,6 +3,7 @@ exports.buildReceiptData = async (row) => {
     participant: {
       name: row.name,
       email: row.email,
+      second_email: row.second_email,
       college: row.college,
       student_year: row.student_year
     },

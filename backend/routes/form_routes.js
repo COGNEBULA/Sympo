@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { createRegistration } = require("../controllers/form_controller");
 const upload = require("../middlewares/upload");
+const { getRegistrationController } = require("../controllers/get_registration_controller");
 
 /* ===============================
    REGISTRATION FORM ROUTE
@@ -14,5 +15,7 @@ router.post(
   upload.single("file"),
   createRegistration
 );
+
+router.get("/get", getRegistrationController);
 
 module.exports = router;
