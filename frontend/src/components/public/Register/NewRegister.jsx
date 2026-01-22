@@ -1,0 +1,754 @@
+import { useEffect, useState } from "react"
+import styles from "./register.module.css"
+import { useNavigate } from "react-router-dom"
+import { ArrowLeft, CheckCircle, Users, User, Sparkles, Clock, AlertCircle, CreditCard } from "lucide-react"
+import { ToastContainer, toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import QRCode from 'qrcode';
+import api from "../../../api/axios"
+import { sympoEvents } from "./data"
+
+const EVENT_GROUPS = [
+  { title: "Technical", mode: "tech", gradient: "from-cyan-500 to-blue-600" },
+  { title: "Non-Technical", mode: "non-tech", gradient: "from-emerald-500 to-teal-600" },
+  { title: "Workshop", mode: "workshop", gradient: "from-amber-500 to-orange-600" },
+]
+
+function EventGroupCard({
+  title,
+  events,
+  selectedEvents,
+  toggleEvent,
+  isFull,
+  isHurryUp,
+  teamData,
+  setTeamName,
+  gradient,
+}) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <div className={styles.eventGroup}>
+      <div className={`${styles.groupHeader} bg-gradient-to-r ${gradient}`} onClick={() => setExpanded(!expanded)}>
+        <div className={styles.groupInfo}>
+          <h3>{title}</h3>
+          <span className={styles.eventCount}>{events.length} events</span>
+        </div>
+        <span className={styles.expandBtn}>{expanded ? "−" : "+"}</span>
+      </div>
+
+      {expanded && (
+        <div className={styles.eventsGrid}>
+          {events.map((event) => {
+            const selected = selectedEvents.some((s) => s.event_name === event.event_name)
+            const hurryUp = isHurryUp(event)
+            const full = isFull(event)
+
+            return (
+              <div
+                key={event.event_name}
+                className={`${styles.eventCard} ${selected ? styles.selected : ""} ${full ? styles.disabled : ""}`}
+              >
+                <div className={styles.eventHeader}>
+                  <div className={styles.eventTitle}>
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => toggleEvent(event)}
+                      disabled={full}
+                      id={`evt-${event.event_name}`}
+                      className={styles.checkbox}
+                    />
+                    <label htmlFor={`evt-${event.event_name}`}>
+                      <span className={styles.eventName}>{event.event_name}</span>
+                    </label>
+                    <span
+                      className={`${styles.sessionBadge} ${
+                        event.isBoth ? styles.multiSession : styles.singleSession
+                      }`}
+                    >
+                      {event.isBoth ? "Double Sessions" : "Single Session"}
+                    </span>
+                  </div>
+
+                  <div className={styles.badges}>
+                    {full && <span className={styles.fullBadge}>Slot Full</span>}
+                    {hurryUp && !full && (
+                      <span className={styles.hurryBadge}>
+                        <Clock size={12} /> {event.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.eventMeta}>
+                  {event.event_mode === "workshop" && (
+                    <span className={`${styles.priceTag} bg-gradient-to-r ${gradient}`}>₹300</span>
+                  )}
+                </div>
+
+                {selected && event.event_type === "team" && (
+                  <div className={styles.teamConfig}>
+                    <div className={styles.teamInputs}>
+                      <input
+                        type="text"
+                        placeholder="Team Name"
+                        value={teamData[event.event_name]?.teamName || ""}
+                        onChange={(e) => setTeamName(event.event_name, e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function RegisterPage() {
+  const navigate = useNavigate()
+  const [events, setEvents] = useState([])
+
+  const [selectedEvents, setSelectedEvents] = useState([])
+  const [teamData, setTeamData] = useState({})
+  const [totalAmount, setTotalAmount] = useState(0)
+  const [form, setForm] = useState({
+    name: "",
+    mobile: "",
+    email: "",
+    college: "",
+    year: "",
+  })
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
+  const [food, setFood] = useState("")
+  const [txnId, setTxnId] = useState("");
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [qrImage, setQrImage] = useState("");
+  const [showPaymentWarning, setShowPaymentWarning] = useState(false);
+  const [warningAccepted, setWarningAccepted] = useState(false);
+  const [upiId, setUpiId] = useState(() => {
+    return localStorage.getItem("upiId"); 
+  });
+
+  useEffect(() => {
+    if (upiId) return; // already cached
+
+    const fetchUpiId = async () => {
+      try {
+        const res = await api.get("/upi"); 
+        if (res.data?.upiId) {
+          setUpiId(res.data.upiId);
+          localStorage.setItem("upiId", res.data.upiId);
+        } else {
+          toast.error("Payment temporarily unavailable");
+        }
+      } catch (err) {
+        toast.error("Unable to load payment details");
+      }
+    };
+
+    fetchUpiId();
+  }, []);
+
+  useEffect(() => {
+      setEvents(sympoEvents)
+  }, [sympoEvents])
+
+  const isSoloOnlyEvent = (event) => {
+    return (
+      event.event_mode === "workshop" ||
+      event.event_name.toLowerCase().includes("hackquest")
+    );
+  };
+
+  const isSingleSessionEvent = (event) => !event.isBoth;
+
+  const getSelectedSessions = () => {
+    return selectedEvents
+      .map(e => teamData[e.event_name]?.session)
+      .filter(Boolean);
+  };
+
+  const calculateAmount = (selectedArr) => {
+    let hasTech = false
+    let hasNonTech = false
+    let workshopCount = 0
+
+    selectedArr.forEach((e) => {
+      if (e.event_mode === "tech") hasTech = true
+      if (e.event_mode === "non-tech") hasNonTech = true
+      if (e.event_mode === "workshop") workshopCount++
+    })
+
+    let amount = 0
+    if (hasTech || hasNonTech) amount += 200
+    amount += workshopCount * 300
+
+    return amount
+  }
+
+  const validate = () => {
+    const err = {}
+
+    if (!form.name.trim()) err.name = "Name is required"
+    if (!form.mobile) {
+      err.mobile = "Mobile number is required"
+    } else if (!/^[6-9]\d{9}$/.test(form.mobile)) {
+      err.mobile = "Enter a valid 10-digit mobile number"
+    }
+    if (!form.email) {
+      err.email = "Email is required"
+    } else if (!/^[a-zA-Z0-9._%+-]+@(gmail\.com|.*\.edu\.in)$/.test(form.email)) {
+      err.email = "Only gmail.com or *.edu.in emails are allowed"
+    }
+    if (!form.college.trim()) err.college = "College name is required"
+    if (!form.year) err.year = "Select your year"
+
+    setErrors(err)
+    const firstError = Object.values(err)[0]
+
+    return Object.keys(err).length === 0
+  }
+
+  const isHurryUp = (event) => event.status === "HURRY_UP";
+
+  const isFull = (event) => event.status === "FULL" || event.remainingSlots === 0
+
+  const canSelectEvent = (event) => {
+    const selected = selectedEvents;
+
+    const hasSoloOnly = selected.some((e) => isSoloOnlyEvent(e));
+    const selectingSoloOnly = isSoloOnlyEvent(event);
+
+    if (isFull(event)) return "This event is already full";
+
+    if (selectingSoloOnly && selected.length > 0) {
+      return "Workshop / HackQuest must be selected alone";
+    }
+
+    if (!selectingSoloOnly && hasSoloOnly) {
+      return "Workshop / HackQuest must be selected alone";
+    }
+
+    if (selected.length >= 2) {
+      return "You can select only 2 events at once";
+    }
+
+    const selectedSessions = getSelectedSessions();
+
+    if (event.isBoth && selectedSessions.length === 1) {
+      // Allow selection, but radio button will restrict session choice
+      return null;
+    }
+
+    if (selected.length === 1) {
+      const firstEvent = selected[0];
+
+      // If first is single-session, second must be multi-session
+      if (
+        (isSingleSessionEvent(firstEvent) &&
+        isSingleSessionEvent(event))
+      ) {
+        return "If you choose a single-session event, the second event must be a 2-session event";
+      }
+    }
+
+    return null;
+  };
+
+  const toggleEvent = (event) => {
+    const alreadySelected = selectedEvents.some((e) => e.event_name === event.event_name)
+    if (alreadySelected) {
+      const updated = selectedEvents.filter((e) => e.event_name !== event.event_name)
+      setSelectedEvents(updated)
+      setTeamData((prev) => {
+        const copy = { ...prev }
+        delete copy[event.event_name]
+        return copy
+      })
+      setTotalAmount(calculateAmount(updated))
+      setPaymentSuccess(false)
+      return
+    }
+
+    const err = canSelectEvent(event);
+    if (err) {
+      toast.info(err, {
+        icon: "⚠️",
+      });
+      return;
+    }
+
+    const updated = [...selectedEvents, event]
+    setSelectedEvents(updated)
+    setTotalAmount(calculateAmount(updated))
+    setPaymentSuccess(false)
+  }
+
+  const setTeamName = (eventName, teamName) => {
+    setTeamData((prev) => ({ ...prev, [eventName]: { ...(prev[eventName] || {}), teamName } }))
+  }
+
+  const yearMap = {
+    "1st Year": 1,
+    "2nd Year": 2,
+    "3rd Year": 3,
+    "4th Year": 4
+  }
+
+  const buildRegistrationData = () => ({
+    name: form.name,
+    college: form.college,
+    email: form.email,
+    food: food,
+    phone: form.mobile,
+    student_year: yearMap[form.year],
+    registration_mode: "online",
+    events: selectedEvents.map((event) => (
+      event.event_name
+    )),
+    teamname: selectedEvents.map((event) => {
+    const team = teamData[event.event_name]
+
+    return (
+      team.teamName
+    )
+  })
+  });
+
+  const getUpiQrUrl = (amount) => {
+    if (!upiId) return null;
+
+    const name = "Cognebula 2026";
+
+    return `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+      name
+    )}&am=${amount}&cu=INR&tn=${encodeURIComponent(
+      "Event Registration"
+    )}`;
+  };
+
+  useEffect(() => {
+    if (!upiId || totalAmount <= 0) {
+      setQrImage("");
+      return;
+    }
+
+    const upiUrl = getUpiQrUrl(totalAmount);
+    if (!upiUrl) return;
+
+    QRCode.toDataURL(upiUrl)
+      .then(setQrImage)
+      .catch(() => {
+        toast.error("Failed to generate payment QR");
+        setQrImage("");
+      });
+  }, [totalAmount, upiId]);
+
+  const handleRegister = async () => {
+    
+    if (!paymentSuccess) {
+      toast.warn("Please complete payment before registering.");
+      return;
+    }
+    
+    if (!validate()) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const payload = buildRegistrationData();
+
+    const formData = new FormData();
+
+    formData.append("data", JSON.stringify({
+      ...payload,
+      transaction_id: txnId
+    }));
+
+    formData.append("file", paymentScreenshot);
+
+    try {
+      setLoading(true);
+
+      const res = await api.post("/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      toast.success("Registration successful!");
+      new Audio("/thanku.mp3").play();
+      setTimeout(() => setShowPopup(true), 400);
+
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <div className={styles.container} style={{ background: "transparent" }}>
+        <div className="hidden lg:block absolute top-8 right-4 z-20 pointer-events-none">
+          <div className="
+            flex items-center gap-3
+            px-5 py-3
+            rounded-full
+            bg-gradient-to-r from-[#2a103d]/80 to-[#1a0a1f]/80
+            backdrop-blur-xl
+            border border-red-400/30
+            shadow-[0_0_30px_rgba(239,68,68,0.25)]
+          ">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+
+            <p className="text-sm text-[#E9DDFF]">
+              <span className="font-semibold text-red-400 uppercase">No on-spot registration</span>
+            </p>
+          </div>
+        </div>
+        <div className={styles.header}>
+          <div className="flex justify-between">
+            <button className={styles.backBtn} onClick={() => navigate(-1)}>
+              <ArrowLeft size={20} />
+              Back
+            </button>
+            <div className="lg:hidden block top-8 right-4 z-20 pointer-events-none">
+              <div className="
+                flex items-center gap-3
+                px-5 py-3
+                rounded-full
+                bg-gradient-to-r from-[#2a103d]/80 to-[#1a0a1f]/80
+                backdrop-blur-xl
+                border border-red-400/30
+                shadow-[0_0_30px_rgba(239,68,68,0.25)]
+              ">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+
+                <p className="text-[10px] text-[#E9DDFF]">
+                  <span className="font-semibold text-red-400 uppercase">No on-spot registration</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className={styles.headerContent}>
+            <h1>Event Registration</h1>
+            <p>Sync Up Cognebula'26</p>
+          </div>
+        </div>
+
+        <ToastContainer
+          position="top-right"
+          autoClose={2500}
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="dark"
+          toastClassName="glass-toast"
+          progressClassName="glass-progress"
+        />
+
+        <div className={styles.layout}>
+          <div className={styles.mainSection}>
+            <div className={`${styles.infoCard} lg:hidden block`}>
+              <div className="flex items-center gap-4 text-red-400">
+                <AlertCircle size={20} />
+                <h4>Important Notes</h4>
+              </div>
+              <ul>
+                <li>Maximum 2 events per participant</li>
+                <li>2nd event participation is based on time availability</li>
+                <li>Workshop / Hack Quest must be selected alone</li>
+                <li>Food preference is mandatory</li>
+                <li>If payment is successful but registration fails, use the same details, UTR and payment screenshot. Do not repay.</li>
+              </ul>
+            </div>
+
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                <Sparkles size={24} className={styles.headerIcon} />
+                <h2>Personal Information</h2>
+              </div>
+              <div className={styles.formGrid}>
+                <div className={styles.formGroup}>
+                  <label>Full Name</label>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value.toUpperCase() })}
+                    placeholder="Enter your full name"
+                    className={errors.name ? styles.inputError : ""}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Mobile Number</label>
+                  <input
+                    type="tel"
+                    value={form.mobile}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "")
+                      if (value.length <= 10) setForm({ ...form, mobile: value })
+                    }}
+                    placeholder="10-digit mobile number"
+                    className={errors.mobile ? styles.inputError : ""}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Email Address</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value.toLowerCase() })}
+                    placeholder="your.email@gmail.com"
+                    className={errors.email ? styles.inputError : ""}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>College Name</label>
+                  <input
+                    type="text"
+                    value={form.college}
+                    onChange={(e) => setForm({ ...form, college: e.target.value })}
+                    placeholder="Enter your college name"
+                    className={errors.college ? styles.inputError : ""}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>Year of Study</label>
+                  <select
+                    value={form.year}
+                    onChange={(e) => setForm({ ...form, year: e.target.value })}
+                    className={errors.year ? styles.inputError : ""}
+                  >
+                    <option value="">Select Year</option>
+                    <option>1st Year</option>
+                    <option>2nd Year</option>
+                    <option>3rd Year</option>
+                    <option>4th Year</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                <Users size={24} className={styles.headerIcon} />
+                <h2>Select Events</h2>
+              </div>
+              <div className={styles.eventsContainer}>
+                {EVENT_GROUPS.map((group) => (
+                  <EventGroupCard
+                    key={group.mode}
+                    title={group.title}
+                    events={events.filter(e => 
+                      e.event_mode === group.mode && e.isAvailable
+                    )}
+                    selectedEvents={selectedEvents}
+                    toggleEvent={toggleEvent}
+                    isFull={isFull}
+                    isHurryUp={isHurryUp}
+                    teamData={teamData}
+                    setTeamName={setTeamName}
+                    gradient={group.gradient}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.sidebar}>
+            <div className={`${styles.infoCard} hidden lg:block`}>
+              <div className="flex items-center gap-4 text-red-400">
+                <AlertCircle size={20} />
+                <h4>Important Notes</h4>
+              </div>
+              <ul>
+                <li>Maximum 2 events per participant</li>
+                <li>2nd event participation is based on time availability</li>
+                <li>Workshop / Hack Quest must be selected alone</li>
+                <li>Food preference is mandatory</li>
+                <li>If payment is successful but registration fails, use the same details, UTR and payment screenshot. Do not repay.</li>
+              </ul>
+            </div>
+
+            <div className={styles.summaryCard}>
+              <h3>Order Summary</h3>
+
+              <div className={styles.summaryItems}>
+                {selectedEvents.length === 0 ? (
+                  <p className={styles.emptyState}>No events selected</p>
+                ) : (
+                  selectedEvents.map((event) => (
+                    <div key={event.event_name} className={styles.summaryItem}>
+                      <span>{event.event_name}</span>
+                      <span className={styles.price}>{event.event_mode === "workshop" ? "₹ 300" : ""}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className={styles.divider}></div>
+
+              <div className={styles.foodPreference}>
+                <label>Food Preference</label>
+                <div className={styles.foodOptions}>
+                  <button type="button" className={food === "veg" ? styles.active : ""} onClick={() => setFood("veg")}>
+                    Vegetarian
+                  </button>
+                  <button
+                    type="button"
+                    className={food === "nonveg" ? styles.active : ""}
+                    onClick={() => setFood("nonveg")}
+                  >
+                    Non-Veg
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.divider}></div>
+
+              <div className={styles.total}>
+                <span>Total Amount</span>
+                <span className={styles.totalAmount}>₹{totalAmount}</span>
+              </div>
+
+              {!paymentSuccess ? (
+                 <>
+                    {/* QR CODE */}
+                    {totalAmount > 0 && qrImage && upiId && (
+                        <>
+                        <div className={styles.qrBox}>
+                            <img src={qrImage} className={styles.qrImage} />
+                            <p className={styles.qrText}>
+                            Scan & Pay ₹{totalAmount}
+                            </p>
+                        </div>
+
+                    {/* TRANSACTION ID */}
+                    <div className={styles.formGroup}>
+                        <label>Transaction UID</label>
+                        <input
+                            type="text"
+                            placeholder="Enter UPI Transaction ID"
+                            value={txnId}
+                            onChange={(e) => setTxnId(e.target.value)}
+                        />
+                    </div>
+
+                    {/* SCREENSHOT UPLOAD */}
+                    <div className={styles.formGroup}>
+                        <label className="p-4">Upload the payment screenshot clearly showing the transaction ID. In case of any mismatch, our team will contact you for verification and payment settlement.</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                          const file = e.target.files[0];
+                          setPaymentScreenshot(file);
+                          setPreviewImage(URL.createObjectURL(file));
+                          }}
+                        />
+                    </div>
+
+                    {previewImage && (
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className={styles.previewImg}
+                        />
+                    )}
+
+                    <button
+                        className={styles.registerBtn}
+                        onClick={() => { setPaymentSuccess(true); setShowPaymentWarning(true); }}
+                        disabled={!txnId || !paymentScreenshot || loading}
+                        >
+                        {loading ? "Payment Verifying" : "Submit Payment"}
+                    </button>
+                    </>
+                )}
+                    
+                </>
+              ) : (
+                <button
+                  className={styles.registerBtn}
+                  style={{ background: "linear-gradient(135deg, #10b981, #059669)" }}
+                  onClick={handleRegister}
+                  disabled={loading || !warningAccepted}
+                >
+                  {loading ? "Completing..." : "Complete Registration"}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {showPaymentWarning && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <div className="flex items-center gap-3 text-yellow-400 mb-4">
+                <AlertCircle size={28} />
+                <h2 className="text-xl font-semibold">Payment Verification Notice</h2>
+              </div>
+
+              <p className="text-slate-300 leading-relaxed mb-6">
+                The <strong>UTR you have entered will be cross-verified</strong> with our
+                payment records.
+                <br /><br />
+                In the event that <strong>any fraudulent entry is detected</strong>, you
+                will be required to <strong>pay the due amount on the day of the symposium</strong>.
+              </p>
+
+              <button
+                className={styles.registerBtn}
+                onClick={() => {
+                  setWarningAccepted(true);
+                  setShowPaymentWarning(false);
+                }}
+              >
+                I Understand & Proceed
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showPopup && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <CheckCircle size={80} className={styles.successIcon} />
+                  <div className="absolute inset-0 animate-ping rounded-full bg-emerald-500/20" />
+                </div>
+              </div>
+              <h2 className="text-3xl font-bold mb-2">Registration Confirmed!</h2>
+              <p className="text-slate-300">You have successfully registered for Cognebula'26.</p>
+              <p className={styles.modalDesc}>Check your email for the confirmation and Food Pass.</p>
+              <button className={styles.modalBtn} onClick={() => navigate("/")}>
+                Back to Home
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  )
+}

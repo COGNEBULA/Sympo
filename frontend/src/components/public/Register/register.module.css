@@ -436,7 +436,7 @@
 
 .eventMeta {
   display: flex;
-  justify-content: space-between;
+  justify-content: end;
   align-items: center;
   margin-top: 12px;
 }
@@ -456,6 +456,7 @@
   font-size: 14px;
   font-weight: 700;
   font-family: "Space Grotesk", sans-serif;
+  text-align: end;
 }
 
 .teamConfig {
