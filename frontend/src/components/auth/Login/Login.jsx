@@ -108,7 +108,7 @@ const RoleLogin = () => {
 
           {error && <p className={styles.error}>{error}</p>}
 
-          <button className={styles.loginBtn} onClick={handleLogin} disabled={loading}>
+          <button type="submit" className={styles.loginBtn} onClick={handleLogin} disabled={loading}>
             <LogIn size={18} />
             {loading ? "Logging in..." : "Login"}
           </button>
