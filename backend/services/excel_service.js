@@ -8,17 +8,16 @@ async function appendToGoogleSheet(registration) {
   try {
     const payload = {
       timestamp: new Date().toISOString(),
-
+      id : registration.id,
       name: registration.name,
       phone: registration.phone,
       email: registration.email,
       college: registration.college,
       student_year: registration.student_year,
-
-      events: registration.events,           // array
+      events: registration.events,   
+      teamname : registration.teamname,        // array
       food: registration.food,
       transaction_id: registration.transaction_id || "",
-
       screenshot_path: registration.screenshot_path
     };
 
