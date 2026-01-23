@@ -1,11 +1,13 @@
 const router = require("express").Router();
-const {login,logout} = require("../controllers/auth_controller");
-const allowRoles = require ("../middlewares/role_access")
+const { login, logout } = require("../controllers/auth_controller");
+const allowRoles = require("../middlewares/role_access")
 const auth = require('../middlewares/auth_middleware');
 const { getAnalytics } = require("../controllers/analytics_controller");
 const { getCoordinatorParticipants } = require("../controllers/event_fetch_controller");
 const { registerParticipantToEvent } = require("../controllers/event_insert_controller");
-
+const { sendCoordinatorCertificates } = require("../controllers/certificate_controller");
+const { checkInParticipant } = require("../controllers/check_in_controller");
+const {updateSecondEmail} = require("../controllers/second_email_controller");
 
 router.post("/login", login);
 router.post("/logout", logout);
@@ -17,10 +19,10 @@ router.post("/logout", logout);
 
 
 //general admin 
-router.get('/admin/dashboard',auth , allowRoles("general"), getAnalytics)
+router.get('/admin/dashboard', auth, allowRoles("general"), getAnalytics)
 
 //event admin
-router.get("/event/data",auth , allowRoles("Auction Arena",
+router.get("/event/data", auth, allowRoles("Auction Arena",
     "Flashback",
     "Cinefrenzy",
     "Battle of Thrones",
@@ -32,9 +34,9 @@ router.get("/event/data",auth , allowRoles("Auction Arena",
     "HackQuest",
     "Query Clash",
     "Shark Tank",
-    "Workshop"),getCoordinatorParticipants)
+    "Workshop"), getCoordinatorParticipants)
 
-router.post("/event/insert",auth , allowRoles("Auction Arena",
+router.post("/event/insert", auth, allowRoles("Auction Arena",
     "Flashback",
     "Cinefrenzy",
     "Battle of Thrones",
@@ -46,6 +48,19 @@ router.post("/event/insert",auth , allowRoles("Auction Arena",
     "HackQuest",
     "Query Clash",
     "Shark Tank"
-    ),registerParticipantToEvent)
+), registerParticipantToEvent)
+
+router.post(
+    "/certificates/coordinator",
+    sendCoordinatorCertificates
+);
+
+router.post(
+    "/checkin/coordinator",auth,allowRoles("registration"), checkInParticipant
+)
+
+router.post(
+    "/second_email/coordinator",auth,allowRoles("registration"), updateSecondEmail
+);
 
 module.exports = router;

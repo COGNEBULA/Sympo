@@ -6,9 +6,6 @@ async function fetchCoordinatorParticipants(role) {
   try {
     await client.query("BEGIN");
 
-    /* =====================================================
-       🔹 ALL CHECKED-IN PARTICIPANTS (by event name)
-    ===================================================== */
     const participantsResult = await client.query(
       `
       SELECT
@@ -17,42 +14,72 @@ async function fetchCoordinatorParticipants(role) {
         phone AS mobile,
         email,
         college,
-        student_year AS year
+        student_year AS year,
+        events,
+        teamName
       FROM registrations
       WHERE
         checkin = true
-        AND $1 = ANY(events)
+        AND $1::TEXT = ANY(events)
       ORDER BY name
       `,
       [role]
     );
 
-    /* =====================================================
-       🌅 MORNING SESSION PARTICIPANTS (NOT AVAILABLE)
-       → RETURN EMPTY DATA TO PRESERVE RESPONSE LOGIC
-    ===================================================== */
-    const morningParticipantsResult = {
-      rowCount: 0,
-      rows: []
-    };
-
-    /* =====================================================
-       🌆 AFTERNOON SESSION PARTICIPANTS (NOT AVAILABLE)
-       → RETURN EMPTY DATA TO PRESERVE RESPONSE LOGIC
-    ===================================================== */
-    const afternoonParticipantsResult = {
-      rowCount: 0,
-      rows: []
-    };
-
     await client.query("COMMIT");
 
     /* =====================================================
-       ✅ FINAL RESPONSE (UNCHANGED)
+       🔹 TEAM OBJECT → { teamName: [members] }
+       (event-index based mapping)
+    ===================================================== */
+    const teams = {};
+
+    for (const row of participantsResult.rows) {
+      // find index of event
+      const eventIndex = Array.isArray(row.events)
+        ? row.events.indexOf(role)
+        : -1;
+
+      if (eventIndex === -1) continue;
+
+      // get team name using SAME index
+      const team =
+        Array.isArray(row.teamname) && row.teamname[eventIndex]
+          ? row.teamname[eventIndex]
+          : null;
+
+      if (!team) continue;
+
+      // create team array if not exists
+      if (!teams[team]) {
+        teams[team] = [];
+      }
+
+      // push member document
+      teams[team].push({
+        registration_id: row.registration_id,
+        name: row.name,
+        mobile: row.mobile,
+        email: row.email,
+        college: row.college,
+        year: row.year,
+        teamName: team
+      });
+    }
+    const indexedParticipants = {};
+    let index = 1;
+
+    for (const team in teams) {
+      indexedParticipants[index] = teams[team];
+      index++;
+    }
+
+    /* =====================================================
+       ✅ FINAL RESPONSE
     ===================================================== */
     return {
       totalCount: participantsResult.rowCount,
-      participants: participantsResult.rows 
+      participants: indexedParticipants
     };
 
   } catch (err) {
