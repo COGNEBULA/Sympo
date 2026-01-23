@@ -46,9 +46,9 @@ exports.createRegistration = async (req, res, next) => {
       throw new ValidationError("At least one event is required");
     }
 
-    if (!req.file) {
-      throw new ValidationError("Payment screenshot is required");
-    }
+    // if (!req.file) {
+    //   throw new ValidationError("Payment screenshot is required");
+    // }
 
     await client.query("BEGIN");
 
@@ -90,7 +90,8 @@ exports.createRegistration = async (req, res, next) => {
       teamname,
       food,
       transaction_id || null,
-      req.file.path
+      // req.file.path
+      email
     ];
 
     const { rows } = await client.query(insertQuery, values);

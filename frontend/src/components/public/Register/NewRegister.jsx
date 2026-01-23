@@ -354,13 +354,18 @@ export default function RegisterPage() {
 
   const handleRegister = async () => {
     
-    if (!paymentSuccess) {
-      toast.warn("Please complete payment before registering.");
-      return;
-    }
+    // if (!paymentSuccess) {
+    //   toast.warn("Please complete payment before registering.");
+    //   return;
+    // }
     
     if (!validate()) {
       window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    
+    if (!food) {
+      toast.warn("Please select a food preference");
       return;
     }
 
@@ -370,10 +375,10 @@ export default function RegisterPage() {
 
     formData.append("data", JSON.stringify({
       ...payload,
-      transaction_id: txnId
+      // transaction_id: txnId
     }));
 
-    formData.append("file", paymentScreenshot);
+    // formData.append("file", paymentScreenshot);
 
     try {
       setLoading(true);
@@ -631,7 +636,7 @@ export default function RegisterPage() {
                 <span className={styles.totalAmount}>₹{totalAmount}</span>
               </div>
 
-              {!paymentSuccess ? (
+              {paymentSuccess ? (
                  <>
                     {/* QR CODE */}
                     {totalAmount > 0 && qrImage && upiId && (
@@ -685,14 +690,13 @@ export default function RegisterPage() {
                     </button>
                     </>
                 )}
-                    
                 </>
               ) : (
                 <button
                   className={styles.registerBtn}
                   style={{ background: "linear-gradient(135deg, #10b981, #059669)" }}
                   onClick={handleRegister}
-                  disabled={loading || !warningAccepted}
+                  disabled={loading || warningAccepted}
                 >
                   {loading ? "Completing..." : "Complete Registration"}
                 </button>
