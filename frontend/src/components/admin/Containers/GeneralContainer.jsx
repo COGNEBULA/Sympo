@@ -13,8 +13,8 @@ const GeneralContainer = () => {
   const [dashboardData, setDashboardData] = useState({
     home: null,
     events: null,
-    onDay: null,
-    payments: null,
+    // onDay: null,
+    // payments: null,
   });
 
   const [loading, setLoading] = useState(true);
@@ -26,13 +26,13 @@ const GeneralContainer = () => {
         const response = await api.get("/admin/dashboard");
 
         if (response.data.success) {
-          const { home, events, onDay, payments } = response.data.data;
+          const { home, events } = response.data.data;
 
           setDashboardData({
             home,
             events,
-            onDay,
-            payments,
+            // onDay,
+            // payments,
           });
         } else {
           setError("Failed to load dashboard data");
@@ -68,7 +68,7 @@ const GeneralContainer = () => {
           >
             Events
           </a>
-          <a
+          {/* <a
             className={`${styles.navLink} ${activeTab === "onday" ? styles.navLinkActive : ""}`}
             onClick={() => setActiveTab("onday")}
           >
@@ -79,14 +79,14 @@ const GeneralContainer = () => {
             onClick={() => setActiveTab("payment")}
           >
             Payment
-          </a>
+          </a> */}
         </div>
       </nav>
 
       {activeTab === "home" && <GeneralHome data={dashboardData.home} />}
       {activeTab === "event" && <EventDashboard data={dashboardData.events} />}
-      {activeTab === "onday" && <OnDay data={dashboardData.onDay} />}
-      {activeTab === "payment" && <PaymentDashboard data={dashboardData.payments} />}
+      {/* {activeTab === "onday" && <OnDay data={dashboardData.onDay} />}
+      {activeTab === "payment" && <PaymentDashboard data={dashboardData.payments} />} */}
     </div>
   );
 };

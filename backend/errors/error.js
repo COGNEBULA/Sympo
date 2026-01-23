@@ -7,18 +7,27 @@ class AppError extends Error {
 }
 
 /* -------- FACTORY FUNCTIONS -------- */
+class ValidationError extends AppError {
+  constructor(message) {
+    super(message, 400);
+  }
+}
 
-const ValidationError = (message) =>
-  new AppError(message, 400);
-
-const ConflictError = (message) =>
-  new AppError(message, 409);
-
-const AuthError = (message) =>
-  new AppError(message, 401);
-
-const ForbiddenError = (message) =>
-  new AppError(message, 403);
+class ConflictError extends AppError {
+  constructor(message) {
+    super(message, 409);
+  }
+}
+class ForbiddenError extends AppError {
+  constructor(message) {
+    super(message, 403);
+  }
+}
+class AuthError extends AppError {
+  constructor(message) {
+    super(message, 401);
+  }
+}
 
 module.exports = {
   AppError,

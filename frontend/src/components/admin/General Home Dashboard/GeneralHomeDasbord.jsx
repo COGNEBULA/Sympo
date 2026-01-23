@@ -93,49 +93,27 @@ const GeneralHome = ({ data }) => {
       thirdYear: 0,
       fourthYear: 0,
     },
-    sessionCounts: { morning: 0, evening: 0 },
+    checkInCount: 0
   });
 
   useEffect(() => {
     if (!data) return;
 
-    // ---- FOOD ----
-    const vegCount = data.food?.veg || 0;
-    const nonVegCount = data.food?.nonveg || 0;
-
-    // ---- YEAR WISE ----
-    const yearWise = {
-      firstYear: 0,
-      secondYear: 0,
-      thirdYear: 0,
-      fourthYear: 0,
-    };
-
-    data.yearWiseParticipants?.forEach((item) => {
-      if (item.student_year === 1) yearWise.firstYear = item.count;
-      if (item.student_year === 2) yearWise.secondYear = item.count;
-      if (item.student_year === 3) yearWise.thirdYear = item.count;
-      if (item.student_year === 4) yearWise.fourthYear = item.count;
-    });
-
     setDashboardData({
       totalRegistrations: data.totalRegistrations || 0,
-      totalFoodCount: vegCount + nonVegCount,
-      vegCount,
-      nonVegCount,
+      totalFoodCount: data.totalFoodCount,
+      vegCount: data.vegCount,
+      nonVegCount: data.nonVegCount,
 
       topColleges:
         data.topColleges?.map((c) => ({
-          name: c.college,
+          name: c.name,
           count: c.count,
         })) || [],
 
-      yearWiseCount: yearWise,
+      yearWiseCount: data.yearWiseCount,
 
-      sessionCounts: {
-        morning: data.sessions?.morning || 0,
-        evening: data.sessions?.evening || 0,
-      },
+      checkInCount: data.checkInCount
     });
   }, [data]);
 
@@ -174,7 +152,7 @@ const GeneralHome = ({ data }) => {
 
         <div className={styles.bottomSection}>
           <div className={`${styles.dataContainer} ${styles.topColleges}`}>
-            <div className={styles.containerTitle}>Top Colleges</div>
+            <div className={styles.containerTitle}>Top 5 Colleges</div>
             <div className={styles.collegeList}>
               {dashboardData.topColleges.map((college, i) => (
                 <div key={i} className={styles.collegeItem}>
@@ -244,23 +222,13 @@ const GeneralHome = ({ data }) => {
 
           <div className={styles.sessionContainer}>
             <div className={`${styles.dataContainer} ${styles.sessionCard}`}>
-              <div className={styles.containerTitle}>Morning Session</div>
-              <div className={styles.sessionCount}>{dashboardData.sessionCounts.morning}</div>
-              <div className={styles.sessionLabel}>Participants</div>
-            </div>
-
-            <div className={`${styles.dataContainer} ${styles.sessionCard}`}>
-              <div className={styles.containerTitle}>Evening Session</div>
-              <div className={styles.sessionCount}>{dashboardData.sessionCounts.evening}</div>
+              <div className={styles.containerTitle}>Total Check-In Count</div>
+              <div className={styles.sessionCount}>{dashboardData.checkInCount}</div>
               <div className={styles.sessionLabel}>Participants</div>
             </div>
           </div>
         </div>
       </main>
-
-      {/* <div className={styles.refreshContainer}>
-        <button className={styles.refreshButton}>↻ Refresh Data</button>
-      </div> */}
     </div>
   );
 };

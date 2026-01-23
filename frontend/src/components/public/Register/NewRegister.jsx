@@ -94,7 +94,7 @@ function EventGroupCard({
                         type="text"
                         placeholder="Team Name"
                         value={teamData[event.event_name]?.teamName || ""}
-                        onChange={(e) => setTeamName(event.event_name, e.target.value)}
+                        onChange={(e) => setTeamName(event.event_name, e.target.value, event.event_type)}
                       />
                     </div>
                   </div>
@@ -194,6 +194,9 @@ export default function RegisterPage() {
     return amount
   }
 
+  console.log("team data", teamData);
+  
+
   const validate = () => {
     const err = {}
 
@@ -210,13 +213,25 @@ export default function RegisterPage() {
     }
     if (!form.college.trim()) err.college = "College name is required"
     if (!form.year) err.year = "Select your year"
-
+    
+    selectedEvents.map((event) => {
+      console.log("checking");
+    
+      const team = teamData[event.event_name]
+    
+      if (team.eventType === "team" && !team.teamName) {
+          toast.warn("Please Fill the team Name for team event");
+          err.teamName = "Team name is required for the selectedteam Events"
+      }
+    })
+      
     setErrors(err)
     const firstError = Object.values(err)[0]
 
     return Object.keys(err).length === 0
   }
-
+  
+  console.log(selectedEvents);
   const isHurryUp = (event) => event.status === "HURRY_UP";
 
   const isFull = (event) => event.status === "FULL" || event.remainingSlots === 0
@@ -292,8 +307,8 @@ export default function RegisterPage() {
     setPaymentSuccess(false)
   }
 
-  const setTeamName = (eventName, teamName) => {
-    setTeamData((prev) => ({ ...prev, [eventName]: { ...(prev[eventName] || {}), teamName } }))
+  const setTeamName = (eventName, teamName, eventType) => {
+    setTeamData((prev) => ({ ...prev, [eventName]: { ...(prev[eventName] || {}), teamName, eventType } }))
   }
 
   const yearMap = {
@@ -317,8 +332,12 @@ export default function RegisterPage() {
     teamname: selectedEvents.map((event) => {
     const team = teamData[event.event_name]
 
+    // if (team.eventType === "team" && !event.teamName.trim()) {
+    //   toast.warn("Please Fill the team Name for team event");
+    // }
+
     return (
-      team.teamName
+      team.teamName.toUpperCase()
     )
   })
   });
@@ -378,7 +397,7 @@ export default function RegisterPage() {
     try {
       setLoading(true);
 
-      const res = await api.post("/register", formData, {
+      await api.post("/register", formData, {
         headers: {
           "Content-Type": "multipart/form-data"
         }
@@ -390,6 +409,7 @@ export default function RegisterPage() {
 
     } catch (error) {
       toast.error(error.response?.data?.message || "Registration failed");
+      console.error("Error Registr",error);
     } finally {
       setLoading(false);
     }

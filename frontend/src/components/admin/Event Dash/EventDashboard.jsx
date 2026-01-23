@@ -26,7 +26,7 @@ const EventDashboard = ({ data }) => {
           data.eventWise?.tech?.map((e) => ({
             name: e.event_name,
             type: "Tech",
-            totalParticipants: e.participant_count,
+            totalParticipants: e.count,
           })) || [],
       },
 
@@ -38,7 +38,7 @@ const EventDashboard = ({ data }) => {
           data.eventWise?.nonTech?.map((e) => ({
             name: e.event_name,
             type: "Non-Tech",
-            totalParticipants: e.participant_count,
+            totalParticipants: e.count,
           })) || [],
       },
 
