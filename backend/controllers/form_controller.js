@@ -120,3 +120,23 @@ exports.createRegistration = async (req, res, next) => {
     client.release();
   }
 };
+
+// controllers/upi.controller.js
+
+exports.sendupi =async (req, res, next) => {
+  try {
+    if (!process.env.UPI_ID) {
+      throw new Error("UPI_ID not configured");
+    }
+
+    res.status(200).json({
+      success: true,
+      upiId: process.env.UPI_ID
+    });
+  } catch (error) {
+    next(error); // 🔥 send to global error handler
+  }
+}
+
+
+
