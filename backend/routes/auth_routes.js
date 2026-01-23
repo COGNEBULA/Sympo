@@ -56,11 +56,11 @@ router.post(
 );
 
 router.post(
-    "/checkin/coordinator", checkInParticipant
+    "/checkin/coordinator",auth,allowRoles("registration"), checkInParticipant
 )
 
 router.post(
-    "/second_email/coordinator", updateSecondEmail
+    "/second_email/coordinator",auth,allowRoles("registration"), updateSecondEmail
 );
 
 module.exports = router;
