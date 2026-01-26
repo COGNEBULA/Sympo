@@ -219,7 +219,7 @@ export default function RegisterPage() {
     
       const team = teamData[event.event_name]
     
-      if (team.eventType === "team" && !team.teamName) {
+      if (team && team.eventType === "team" && !team.teamName) {
           toast.warn("Please Fill the team Name for team event");
           err.teamName = "Team name is required for the selectedteam Events"
       }
@@ -332,13 +332,7 @@ export default function RegisterPage() {
     teamname: selectedEvents.map((event) => {
     const team = teamData[event.event_name]
 
-    // if (team.eventType === "team" && !event.teamName.trim()) {
-    //   toast.warn("Please Fill the team Name for team event");
-    // }
-
-    return (
-      team.teamName.toUpperCase()
-    )
+    return team ? team.teamName.toUpperCase() : null
   })
   });
 

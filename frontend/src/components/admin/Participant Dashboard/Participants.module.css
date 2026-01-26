@@ -62,7 +62,6 @@
 .table td {
   padding: 12px;
   border-bottom: 1px solid #e5e7eb;
-  text-align: left;
 }
 
 .table th {
@@ -159,4 +158,22 @@
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+}
+
+.teamGroupStart {
+  /* background-color: #f0f9ff; */
+  border-top: 2px solid #2563eb;
+}
+
+.teamGroupStart:first-child {
+  border-top: none;
+}
+
+.teamNameCell {
+  font-weight: 600;
+  color: #2563eb;
+  background-color: #e0f2fe;
+  /* border-right: 2px solid #2563eb; */
+  vertical-align: middle;
+  text-align: center;
 }

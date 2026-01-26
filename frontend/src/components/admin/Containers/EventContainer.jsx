@@ -14,10 +14,10 @@ const EventContainer = () => {
   const [activeTab, setActiveTab] = useState("participants");
   const [dashboardData, setDashboardData] = useState({
     participants: null,
-    morningSessionParticipants: null,
-    afternoonSessionParticipants: null
+    // morningSessionParticipants: null,
+    // afternoonSessionParticipants: null
   });
-  
+  const [event, setEvent] = useState("")
   const role = localStorage.getItem("role") ?? "";
   
   const teamEvent = useMemo(() => {
@@ -35,13 +35,12 @@ const EventContainer = () => {
         
 
         if (response.data.success) {
-          const { participants, morningSessionParticipants, afternoonSessionParticipants } = response.data;
+          const { participants, event } = response.data;
 
           setDashboardData({
             participants,
-            morningSessionParticipants,
-            afternoonSessionParticipants
           });
+          setEvent(event)
         } else {
           setError("Failed to load dashboard data");
         }
@@ -74,14 +73,14 @@ const EventContainer = () => {
             Participants
           </a>
 
-          <a
+          {/*<a
             className={`${styles.navLink} ${
               activeTab === "checkin" ? styles.navLinkActive : ""
             }`}
             onClick={() => setActiveTab("checkin")}
           >
             Check-In Status
-          </a>
+          </a>*/}
         </div>
       </nav>
 
@@ -90,15 +89,17 @@ const EventContainer = () => {
         (teamEvent ? (
           <ParticipantsTeam
             participants={dashboardData.participants}
+            event={event}
           />
         ) : (
           <Participants
             participants={dashboardData.participants}
+            event={event}
           />
         ))}
 
       {/* CHECK-IN */}
-      {activeTab === "checkin" &&
+      {/* {activeTab === "checkin" &&
         (teamEvent ? (
           <CheckInStatusTeam
             morningSessionParticipants={dashboardData.morningSessionParticipants}
@@ -109,7 +110,7 @@ const EventContainer = () => {
             morningSessionParticipants={dashboardData.morningSessionParticipants}
             afternoonSessionParticipants={dashboardData.afternoonSessionParticipants}
           />
-        ))}
+        ))} */}
     </div>
   );
 };

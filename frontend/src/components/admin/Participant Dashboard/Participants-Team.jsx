@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Participants.module.css';
 import api from '../../../api/axios';
+import Swal from 'sweetalert2';
 
-const ParticipantsTeam = ({ participants }) => {
+const ParticipantsTeam = ({ participants, event }) => {
   const [isButtonEnabled, setButtonEnabled] = useState(false);
   const [buttonText, setButtonText] = useState('Send Certificates');
   const [showCheckboxes, setShowCheckboxes] = useState(false);
@@ -24,13 +25,26 @@ const ParticipantsTeam = ({ participants }) => {
 
   const [selectedIds, setSelectedIds] = useState([]);
 
-  useEffect(() => {
-    if (participants?.length) {
-      setSelectedIds(participants.map(p => p.registration_id));
-    }
-  }, [participants]);
-
+  
   const participantsPerPage = 20;
+  
+  const normalizedParticipants = React.useMemo(() => {
+    if (!participants) return [];
+    
+    return Object.entries(participants).map(([teamId, members]) => ({
+      teamId,
+      teamName: members[0]?.teamName ?? '-',
+      members,
+      leader: members[0], // optional
+      memberCount: members.length
+    }));
+  }, [participants]);
+    
+  // useEffect(() => {
+  //   if (normalizedParticipants?.length) {
+  //     setSelectedIds(normalizedParticipants.members.map(p => p.registration_id));
+  //   }
+  // }, [normalizedParticipants]);
 
   useEffect(() => {
     const symposiumDate = new Date('2026-01-07T00:00:00');
@@ -40,7 +54,7 @@ const ParticipantsTeam = ({ participants }) => {
     }
   }, [certificatesSent]);
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     if (!isButtonEnabled || certificatesSent) return;
 
     if (!showCheckboxes) {
@@ -52,18 +66,20 @@ const ParticipantsTeam = ({ participants }) => {
       );
 
       if (confirmSend) {
-        fetch('http://localhost:5000/api/send_certificates', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ids: selectedIds })
-        })
-          .then(res => res.json())
-          .then(() => {
-            setCertificatesSent(true);
-            setButtonEnabled(false);
-            setShowCheckboxes(false);
-            setButtonText('Send Certificates');
-          });
+        await api.post('/certificates/coordinator', { registrationIds: selectedIds, eventName: event })
+        setCertificatesSent(true);
+        setButtonEnabled(false);
+        setShowCheckboxes(false);
+        setButtonText('Send Certificates');
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Certificates sent',
+          text: `Sent to ${selectedIds.length} participant(s).`,
+          timer: 1800,
+          showConfirmButton: false
+        });
+          
       }
     }
   };
@@ -93,34 +109,45 @@ const ParticipantsTeam = ({ participants }) => {
       alert('At least a leader ID is required');
       return;
     }
-console.log(participant_ids, teamName);
 
     try {
-      const response = await api.post(
-        '/event/insert',
-        {
-          participant_ids,
-          team_name: teamName || null
-        }
-      );
+      // Loop through each participant and register them individually
+      for (let i = 0; i < participant_ids.length; i++) {
+        const participantId = participant_ids[i];
+        const response = await api.post(
+          '/event/insert',
+          {
+            participant_ids: participantId.toString(), // endpoint expects string
+            team_name: teamName || null
+          }
+        );
 
-      if (response.data.success) {
-        alert('Team added successfully');
-    
-        setShowModal(false);
-        setTeamForm({
-          leaderId: '',
-          teamName: '',
-          member2: '',
-          member3: '',
-          member4: '',
-          member5: ''
-        });
+        if (!response.data.success) {
+          throw new Error(`Failed to add participant ID: ${participantId}`);
+        }
       }
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Team added',
+        text: `Added ${participant_ids.length} member(s).`,
+        timer: 1700,
+        showConfirmButton: false
+      });
+  
+      setShowModal(false);
+      setTeamForm({
+        leaderId: '',
+        teamName: '',
+        member2: '',
+        member3: '',
+        member4: '',
+        member5: ''
+      });
     } catch (err) {
       console.log(err);
       
-      alert(err.message);
+      alert(err.message || 'Failed to add team');
     }
   };
 
@@ -130,19 +157,31 @@ console.log(participant_ids, teamName);
     );
   };
 
-  const filteredParticipants = participants.filter(part =>
-    part.registration_id.toString().includes(searchTerm) ||
-    part.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (part.team ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredParticipants = normalizedParticipants.filter(part =>
+    part.members.filter(part => 
+      part.registration_id.toString().includes(searchTerm) ||
+      part.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (part.teamName ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
-  const dataToDisplay = searchTerm ? filteredParticipants : participants;
+  const dataToDisplay = searchTerm ? filteredParticipants : normalizedParticipants;
 
   const indexOfLast = currentPage * participantsPerPage;
   const indexOfFirst = indexOfLast - participantsPerPage;
   const currentParticipants = dataToDisplay.slice(indexOfFirst, indexOfLast);
 
   const totalPages = Math.ceil(dataToDisplay.length / participantsPerPage);
+
+  // Flatten the current participants and group by team
+  const flattenedWithTeamInfo = currentParticipants.flatMap(team =>
+    team.members.map((member, idx) => ({
+      ...member,
+      teamId: team.teamId,
+      isFirstMemberOfTeam: idx === 0,
+      memberCountInTeam: team.members.length
+    }))
+  );
 
   return (
     <div className={styles.container}>
@@ -176,33 +215,35 @@ console.log(participant_ids, teamName);
               <th>ID</th>
               <th>Name</th>
               <th>Mobile</th>
-              {/* <th>Team Name</th> */}
+              <th>Team Name</th>
               <th>Email</th>
               <th>College</th>
               <th>Year</th>
-              <th>Session</th>
             </tr>
           </thead>
           <tbody>
-            {currentParticipants.map(part => (
-              <tr key={part.registration_id}>
+            {flattenedWithTeamInfo.map((member, idx) => (
+              <tr key={member.registration_id} className={member.isFirstMemberOfTeam ? styles.teamGroupStart : styles.teamGroupContinue}>
                 {showCheckboxes && (
                   <td>
                     <input
                       type="checkbox"
-                      checked={selectedIds.includes(part.registration_id)}
-                      onChange={() => toggleSelection(part.registration_id)}
+                      checked={selectedIds.includes(member.registration_id)}
+                      onChange={() => toggleSelection(member.registration_id)}
                     />
                   </td>
                 )}
-                <td>{part.registration_id}</td>
-                <td>{part.name}</td>
-                <td>{part.mobile}</td>
-                {/* <td>{part.team}</td> */}
-                <td>{part.email}</td>
-                <td>{part.college}</td>
-                <td>{part.year}</td>
-                <td>{part.session}</td>
+                <td>{member.registration_id}</td>
+                <td>{member.name}</td>
+                <td>{member.mobile}</td>
+                {member.isFirstMemberOfTeam && (
+                  <td rowSpan={member.memberCountInTeam} className={styles.teamNameCell}>
+                    {member.teamName}
+                  </td>
+                )}
+                <td>{member.email}</td>
+                <td>{member.college}</td>
+                <td>{member.year}</td>
               </tr>
             ))}
           </tbody>

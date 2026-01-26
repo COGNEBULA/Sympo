@@ -29,6 +29,37 @@ async function fetchCoordinatorParticipants(role) {
     await client.query("COMMIT");
 
     /* =====================================================
+       🔹 Handle the individul=al Events 
+    ===================================================== */
+
+    const isIndividualEvent = participantsResult.rows.every(row => {
+      const eventIndex = Array.isArray(row.events)
+        ? row.events.indexOf(role)
+        : -1;
+
+      if (eventIndex === -1) return true;
+
+      return !(
+        Array.isArray(row.teamname) &&
+        row.teamname[eventIndex]
+      );
+    });
+
+    if (isIndividualEvent) {
+      return {
+        totalCount: participantsResult.rowCount,
+        participants: participantsResult.rows.map(row => ({
+          registration_id: row.registration_id,
+          name: row.name,
+          mobile: row.mobile,
+          email: row.email,
+          college: row.college,
+          year: row.year
+        }))
+      };
+    }
+
+    /* =====================================================
        🔹 TEAM OBJECT → { teamName: [members] }
        (event-index based mapping)
     ===================================================== */
