@@ -11,7 +11,8 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
 
     sheet.appendRow([
-      new Date(),                                   // Timestamp
+      new Date(),  
+      data.id || "",                                 // Timestamp
       data.name || "",
       data.phone || "",
       data.email || "",
@@ -20,6 +21,9 @@ function doPost(e) {
       Array.isArray(data.events)
         ? data.events.join(", ")
         : data.events || "",
+       Array.isArray(data.teamname)
+        ? data.teamname.join(", ")
+        : data.teamname || "",
       data.food || "",
       data.transaction_id || "",
       data.screenshot_path || ""

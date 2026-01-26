@@ -9,6 +9,7 @@ exports.buildReceiptData = async (row) => {
     },
     events: row.events,
     food: row.food,
-    transaction_id: row.transaction_id
+    transaction_id: row.transaction_id,
+    receipt_id:`COG26-${row.id}`
   };
 };
