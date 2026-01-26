@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Participants.module.css';
 import api from '../../../api/axios';
+import Swal from 'sweetalert2';
 
-const Participants = ({ participants }) => {
+const Participants = ({ participants, event }) => {
   const [isButtonEnabled, setButtonEnabled] = useState(false);
   const [buttonText, setButtonText] = useState('Send Certificates');
   const [showCheckboxes, setShowCheckboxes] = useState(false);
@@ -31,7 +32,7 @@ const Participants = ({ participants }) => {
     }
   }, [certificatesSent]);
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     if (!isButtonEnabled || certificatesSent) return;
 
     if (!showCheckboxes) {
@@ -40,21 +41,22 @@ const Participants = ({ participants }) => {
     } else {
       const confirmSend = window.confirm(
         `Send certificates to ${selectedIds.length} participants?`
-      );
+      );      
 
       if (confirmSend) {
-        fetch('http://localhost:5000/api/send_certificates', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ids: selectedIds })
-        })
-          .then(res => res.json())
-          .then(() => {
-            setCertificatesSent(true);
-            setButtonEnabled(false);
-            setShowCheckboxes(false);
-            setButtonText('Send Certificates');
-          });
+        await api.post('/certificates/coordinator', { registrationIds: selectedIds, eventName: event });
+        setCertificatesSent(true);
+        setButtonEnabled(false);
+        setShowCheckboxes(false);
+        setButtonText('Send Certificates');
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Certificates sent',
+          text: `Sent to ${selectedIds.length} participant(s).`,
+          timer: 1800,
+          showConfirmButton: false
+        });
       }
     }
   };
@@ -72,7 +74,13 @@ const Participants = ({ participants }) => {
     );
 
     if (response.data.success) {
-      alert('Participant added successfully');
+      Swal.fire({
+        icon: 'success',
+        title: 'Added participant',
+        text: `Participant ${newParticipantId} added.`,
+        timer: 1700,
+        showConfirmButton: false
+      });
 
       // OPTIONAL: refresh list from backend if you have an API
       // await fetchParticipants();
@@ -147,7 +155,6 @@ const Participants = ({ participants }) => {
               <th>Email</th>
               <th>College</th>
               <th>Year</th>
-              <th>Session</th>
             </tr>
           </thead>
           <tbody>
@@ -168,7 +175,6 @@ const Participants = ({ participants }) => {
                 <td>{part.email}</td>
                 <td>{part.college}</td>
                 <td>{part.year}</td>
-                <td>{part.session}</td>
               </tr>
             ))}
           </tbody>

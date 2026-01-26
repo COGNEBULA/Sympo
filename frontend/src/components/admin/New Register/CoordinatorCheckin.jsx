@@ -1,37 +1,13 @@
 import React, { useState, useEffect } from "react";
 import styles from "./CoordinatorCheckin.module.css";
+import api from "../../../api/axios";
+import Swal from "sweetalert2";
 
 const symposiumDate = new Date("2026-01-07T00:00:00");
 
 const CoordinatorCheckin = () => {
-  const [participants, setParticipants] = useState([
-    {
-      id: "COG-504",
-      name: "Alice",
-      events: ["Ideathon", "Hackathon"],
-      year: "3",
-      college: "ABC College",
-      mobile: "9876543210",
-      email: "alice@mail.com",
-      blacklist: false,
-      entered: false,
-      checkedIn: false,
-      secondaryMail: ""
-    },
-    {
-      id: "COG-505",
-      name: "Bob",
-      events: ["Debugging"],
-      year: "2",
-      college: "XYZ College",
-      mobile: "9999999999",
-      email: "bob@mail.com",
-      blacklist: true,
-      entered: false,
-      checkedIn: false,
-      secondaryMail: ""
-    }
-  ]);
+  const [participants, setParticipants] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterMode, setFilterMode] = useState("overall"); // overall | blacklist
@@ -41,6 +17,40 @@ const CoordinatorCheckin = () => {
   const [confirmEnterId, setConfirmEnterId] = useState(null);
 
   const [isLocked, setIsLocked] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get('/get');
+        console.log("API Response:", res.data);
+        
+        if (res.data.success && res.data.registrationData?.registrationData) {
+          const transformedData = res.data.registrationData.registrationData.map((participant) => ({
+            id: `COG-${participant.id}`,
+            name: participant.name,
+            events: Array.isArray(participant.events) ? participant.events : [participant.events],
+            year: participant.student_year?.toString() || "",
+            college: participant.college,
+            mobile: participant.phone,
+            email: participant.email,
+            blacklist: participant.blacklist || false,
+            entered: false,
+            checkedIn: participant.checkin || false,
+            secondaryMail: participant.second_email || "",
+            registrationId: participant.id,
+            teamname: participant.teamname
+          }));
+          
+          setParticipants(transformedData);
+        }
+      } catch (error) {
+        console.error("Error fetching the Registered participant Details", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [])
 
   useEffect(() => {
     const now = new Date();
@@ -69,18 +79,57 @@ const CoordinatorCheckin = () => {
     return true;
   });
 
-  const handleCheckin = (id) => {
+  const handleCheckin = async (id) => {
+    const participant = participants.find(p => p.id === id);
+    const registrationId = participant?.registrationId;
+    const secondaryMail = participant?.secondaryMail;
+
     setParticipants(prev =>
       prev.map(p =>
         p.id === id ? { ...p, checkedIn: true } : p
       )
     );
 
-    fetch("http://localhost:5000/api/checkin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ participantId: id })
-    });
+    try {
+      if (!secondaryMail || secondaryMail.trim() === '') {
+        // No secondary mail, just checkin
+        await api.post('/checkin/coordinator', { registration_id: registrationId });
+      } else {
+        // Has secondary mail, update it first then checkin
+        await api.post('/second_email/coordinator', { 
+          registration_id: registrationId,
+          second_email: secondaryMail 
+        });
+      }
+
+      // Show success alert
+      await Swal.fire({
+        icon: 'success',
+        title: 'Check-in Successful!',
+        text: `${participant?.name} has been checked in.`,
+        confirmButtonColor: '#22c55e',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
+    } catch (error) {
+      console.error("Error during checkin:", error);
+      
+      // Revert the state if the API call fails
+      setParticipants(prev =>
+        prev.map(p =>
+          p.id === id ? { ...p, checkedIn: false } : p
+        )
+      );
+
+      // Show error alert
+      await Swal.fire({
+        icon: 'error',
+        title: 'Check-in Failed!',
+        text: error.response?.data?.message || 'An error occurred during check-in. Please try again.',
+        confirmButtonColor: '#ef4444'
+      });
+    }
   };
 
   const handleEnterConfirm = () => {
@@ -90,10 +139,11 @@ const CoordinatorCheckin = () => {
       )
     );
 
+    const registrationId = participants.find(p => p.id === confirmEnterId)?.registrationId;
     fetch("http://localhost:5000/api/mark_entered", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ participantId: confirmEnterId })
+      body: JSON.stringify({ participantId: registrationId })
     });
 
     setConfirmEnterId(null);
@@ -166,58 +216,79 @@ const CoordinatorCheckin = () => {
 
       {/* 🔥 TABLE */}
       <div className={styles.tableWrapper}>
-        <div className={styles.headerRow}>
-          <span>PART ID</span>
-          <span>NAME</span>
-          <span>EVENTS</span>
-          <span>YEAR</span>
-          <span>COLLEGE</span>
-          <span>MOBILE</span>
-          <span>MAIL</span>
-          <span>SECONDARY MAIL</span>
-          <span>CHECK IN</span>
-          <span>ENTER</span>
-        </div>
-
-        {filteredParticipants.map((p) => (
-          <div
-            key={p.id}
-            className={`${styles.dataRow} ${p.entered ? styles.disabledRow : ""}`}
-          >
-            <span>{p.id}</span>
-            <span>{p.name}</span>
-            <span>{p.events.join(", ")}</span>
-            <span>{p.year}</span>
-            <span>{p.college}</span>
-            <span>{p.mobile}</span>
-            <span>{p.email}</span>
-
-            <input
-              type="text"
-              value={p.secondaryMail}
-              onChange={(e) => handleSecondaryMailChange(p.id, e.target.value)}
-              disabled={isLocked || p.entered}
-            />
-
-            {/* CHECK-IN BUTTON */}
-            <button
-              className={styles.checkinBtn}
-              disabled={isLocked || p.entered}
-              onClick={() => handleCheckin(p.id)}
-            >
-              Checkin
-            </button>
-
-            {/* ENTRY BUTTON */}
-            <button
-              className={styles.entryBtn}
-              disabled={isLocked || p.entered}
-              onClick={() => setConfirmEnterId(p.id)}
-            >
-              ✔
-            </button>
-          </div>
-        ))}
+        <table className={styles.dataTable}>
+          <thead>
+            <tr>
+              <th>PART ID</th>
+              <th>NAME</th>
+              <th>EVENTS</th>
+              <th>YEAR</th>
+              <th>COLLEGE</th>
+              <th>MOBILE</th>
+              <th>MAIL</th>
+              <th>SECONDARY MAIL</th>
+              <th>CHECK IN</th>
+              {/* <th>ENTER</th> */}
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="10" className={styles.loadingMessage}>
+                  Loading participants...
+                </td>
+              </tr>
+            ) : filteredParticipants.length === 0 ? (
+              <tr>
+                <td colSpan="10" className={styles.emptyMessage}>
+                  No participants found
+                </td>
+              </tr>
+            ) : (
+              filteredParticipants.map((p) => (
+                <tr
+                  key={p.id}
+                  className={p.entered ? styles.disabledRow : ""}
+                >
+                  <td>{p.id}</td>
+                  <td>{p.name}</td>
+                  <td>{p.events.join(", ")}</td>
+                  <td>{p.year}</td>
+                  <td>{p.college}</td>
+                  <td>{p.mobile}</td>
+                  <td>{p.email}</td>
+                  <td>
+                    <input
+                      type="text"
+                      value={p.secondaryMail}
+                      onChange={(e) => handleSecondaryMailChange(p.id, e.target.value)}
+                      disabled={isLocked || p.entered || p.secondaryMail}
+                      className={styles.secondaryMailInput}
+                    />
+                  </td>
+                  <td>
+                    <button
+                      className={styles.checkinBtn}
+                      disabled={isLocked || p.entered || p.checkedIn}
+                      onClick={() => handleCheckin(p.id)}
+                    >
+                      Checkin
+                    </button>
+                  </td>
+                  {/* <td>
+                    <button
+                      className={styles.entryBtn}
+                      disabled={isLocked || p.entered}
+                      onClick={() => setConfirmEnterId(p.id)}
+                    >
+                      ✔
+                    </button>
+                  </td> */}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
 

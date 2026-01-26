@@ -481,11 +481,10 @@
     "color": "neonred",
     "icon": "/flyicon/spydi.png",
     "img": "/eventimg/workshop.png",
-    "session": "Single Session",
     "description": "Exclusively Based on Artificial Intelligence",
     "DOthethink": {
       "id": "WORKSHOP01",
-      "title": "Short Film Contest",
+      "title": "Building Smart Chatbots Using Retrieval-Augmented Generation (RAG)",
       "sympoImg": "/images/shortfilm.jpg",
       "description": "Create and submit an original short film based on the given theme.",
       "rules": [
@@ -493,11 +492,11 @@
         "Any genre allowed",
         "Original content only"
       ],
-      "hurryUp": "Submit early!",
-      "eventLeader": {
-        "name": "Kiran S",
-        "phone": "9554433221"
-      },
+      "teamlimit": "Individual Event",
+      "place": "To be announced",
+      "session": "Single Session",
+      "time": "To be announced",
+      "hurryUp": "Show your musical talent!",
       "coordinators": [
         {
           "name": "to be announsed",

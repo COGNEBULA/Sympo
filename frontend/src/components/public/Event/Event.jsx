@@ -41,11 +41,10 @@ export default function Event() {
   const navigate = useNavigate();
   const handleCardClick = (item, index) => {
     if (item.type === "workshop") {
-      // const firstWorkshopEvent = item.events?.[0];
-
-      // if (firstWorkshopEvent?.key) {
-      //   navigate(`/event/workshop/${firstWorkshopEvent.key}`);
-      // }
+      const firstWorkshopEvent = item.events?.[0];
+      if (firstWorkshopEvent?.key) {
+        navigate(`/event/workshop/${firstWorkshopEvent.key}`);
+      }
       return;
     }
 
