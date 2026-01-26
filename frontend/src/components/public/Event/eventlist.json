@@ -482,25 +482,41 @@
     "icon": "/flyicon/spydi.png",
     "img": "/eventimg/workshop.png",
     "description": "Exclusively Based on Artificial Intelligence",
-    "DOthethink": {
+    "RAG_Chatbots": {
       "id": "WORKSHOP01",
       "title": "Building Smart Chatbots Using Retrieval-Augmented Generation (RAG)",
-      "sympoImg": "/images/shortfilm.jpg",
-      "description": "Create and submit an original short film based on the given theme.",
+      "sympoImg": "/images/rag_workshop.png",
+      "description": "Building Smart Chatbots Using Retrieval-Augmented Generation (RAG) explores how modern chatbots can be enhanced by combining the power of large language models with external knowledge sources. Instead of relying only on pre-trained data, RAG-based chatbots retrieve relevant information from documents, databases, or knowledge bases in real time and use it to generate accurate, context-aware responses. This approach significantly reduces hallucinations and improves the reliability of chatbot outputs. The session covers the core concepts of retrieval mechanisms, vector databases, embeddings, and how they integrate with language models to deliver intelligent conversations. Participants will gain insights into designing scalable, up-to-date, and domain-specific chatbots suitable for applications such as customer support, education, healthcare, and enterprise systems. By leveraging RAG, developers can build chatbots that are more trustworthy, adaptable, and capable of delivering precise information, making them a powerful solution for real-world conversational AI challenges.",
       "rules": [
-        "Maximum duration: 5 minutes",
-        "Any genre allowed",
-        "Original content only"
+        "Bring your own laptop with the required software installed for hands-on implementation.",
+        "Carry a notebook and pen to note important concepts and implementation steps.",
+        "Ensure you have a stable personal internet/network connection throughout the session.",
+        "Maintain proper decorum and discipline during the workshop.",
+        "Follow the instructions given by the lecturer at all times.",
+        "If you have any doubts, please be patient and raise your hand.",
+        "A microphone will be provided to you to ask and clarify your questions."
       ],
       "teamlimit": "Individual Event",
-      "place": "To be announced",
+      "place": "Mechanical seminar hall",
       "session": "Single Session",
-      "time": "To be announced",
-      "hurryUp": "Show your musical talent!",
+      "time": "11:00 AM - 1:00 PM (Break 1:00 PM - 2:00 PM)",
+      "hurryUp": "Learn RAG-based chatbot development!",
       "coordinators": [
         {
-          "name": "to be announsed",
-          "phone": "nil"
+          "name": "Srishti",
+          "phone": "8838279086"
+        },
+        {
+          "name": "Yuvashree",
+          "phone": "8056215651"
+        },
+        {
+          "name": "Jayashree",
+          "phone": "6374678959"
+        },
+        {
+          "name": "Mukesh",
+          "phone": "7604965113"
         }
       ]
     }
