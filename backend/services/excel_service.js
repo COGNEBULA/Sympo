@@ -1,11 +1,17 @@
 const axios = require("axios");
 
+const BASE_URL = process.env.BASE_URL; 
 /* ===============================
    APPEND TO GOOGLE SHEET
    (NON-CRITICAL SIDE EFFECT)
 =============================== */
 async function appendToGoogleSheet(registration) {
   try {
+
+    const screenshotPath = registration.screenshot_path
+      ? `${BASE_URL}${registration.screenshot_path.startsWith("/") ? "" : "/"}${registration.screenshot_path}`
+      : "";
+
     const payload = {
       timestamp: new Date().toISOString(),
       id : registration.id,
@@ -18,7 +24,7 @@ async function appendToGoogleSheet(registration) {
       teamname : registration.teamname,        // array
       food: registration.food,
       transaction_id: registration.transaction_id || "",
-      screenshot_path: registration.screenshot_path
+      screenshot_path: screenshotPath
     };
 
     const response = await axios.post(
