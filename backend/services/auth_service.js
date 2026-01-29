@@ -1,5 +1,5 @@
 const { getClient } = require("../config/db");
-const AppError = require("../errors/error");
+const { AuthError } = require("../errors/error");
 
 exports.loginUser = async (email, dob) => {
   const client = await getClient();
@@ -12,7 +12,7 @@ exports.loginUser = async (email, dob) => {
   );
 
   if (result.rowCount === 0) {
-    throw new AppError("Invalid credentials", 401);
+    throw new AuthError("Invalid credentials");
   }
 
   return result.rows[0];

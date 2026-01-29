@@ -73,6 +73,45 @@
   animation-delay: calc(var(--i) * -1.5s);
 }
 
+.sponsorName {
+  position: absolute;
+  top: 105%;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+
+  padding: 6px 14px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  color: var(--nebula-light);
+  font-family: "JetBrains Mono", monospace;
+
+  background: linear-gradient(
+    180deg,
+    rgba(40, 20, 70, 0.75),
+    rgba(15, 8, 30, 0.75)
+  );
+
+  border-radius: 999px;
+  border: 1px solid rgba(206, 162, 253, 0.3);
+
+  box-shadow:
+    0 0 18px rgba(137, 104, 205, 0.6),
+    inset 0 0 12px rgba(206, 162, 253, 0.25);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.floatingLogo:hover .sponsorName,
+.floatingLogo:focus-within .sponsorName {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* spread logos manually (prevents overlap) */
 .floatingLogo:nth-child(1) { top: 10%; left: 18%; }
 .floatingLogo:nth-child(2) { top: 22%; left: 38%; }
@@ -182,6 +221,7 @@
   max-width: 520px;
   padding: 38px;
   border-radius: 28px;
+  font-family: "Roboto Mono", monospace;
 
   background: linear-gradient(
     180deg,
@@ -204,18 +244,22 @@
 .glassBox h2 {
   font-size: 32px;
   color: var(--nebula-light);
-  font-family: "JetBrains Mono", monospace;
+  /* font-family: "JetBrains Mono", monospace; */
+  font-family: "Roboto Mono", monospace;
   letter-spacing: 0.06em;
 }
 
 .glassBox p {
   color: #cfc7f8;
+  font-family: "Roboto Mono", monospace;
 }
 
 .quote {
   color: var(--nebula-light);
   opacity: 0.9;
   text-shadow: 0 0 18px rgba(206, 162, 253, 0.5);
+  font-family: "Roboto Mono", monospace;
+  text-align: center;
 }
 
 /* Responsive */
@@ -229,6 +273,7 @@
     height: 320px;
   }
 }
+
 /* ===========================
    MOBILE FIX (≤ 768px)
    =========================== */
@@ -244,14 +289,14 @@
   .bubbleContainer {
     width: 100%;
     max-width: 340px;
-    height: 500px;
+    height: 300px;
     margin: 0 auto;
     margin-top: 0;
   }
 
   /* Reduce logo size */
   .floatingLogo img {
-    width: 72px;
+    width: 112px;
     padding: 10px;
     border-radius: 14px;
   }

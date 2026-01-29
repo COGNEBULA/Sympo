@@ -3,14 +3,10 @@ import React from "react";
 import styles from "./sponsor.module.css";
 
 const sponsors = [
-  { name: "Amazon", img: "/images/Sponsors/amazon.png" },
-  { name: "Tesla", img: "/images/Sponsors/tesla.png" },
-  { name: "Sony", img: "/images/Sponsors/sony.png" },
-  { name: "Binance", img: "/images/Sponsors/red.png" },
-  { name: "ASOS", img: "/images/Sponsors/red.png" },
-  { name: "Crocs", img: "/images/Sponsors/crocs.png" },
-  { name: "Medium", img: "/images/Sponsors/mahindra.png" },
-  { name: "Unimed", img: "/images/Sponsors/adiddas.png" },
+  { name: "Atlanwa", img: "/images/Sponsors/atlanva.png" },
+  { name: "Coat Park", img: "/images/Sponsors/coatpark.png" },
+  { name: "JD Dog Robot", img: "/images/Sponsors/dogrobot.webp" },
+  { name: "Square Brothers", img: "/images/Sponsors/squarebrothers.png" }
 ];
 
 export default function Sponsor() {
@@ -18,8 +14,6 @@ export default function Sponsor() {
     <section >
       <header className={styles.header}>
         <h1 className={styles.title}>OUR SPONSORS</h1>
-        <div className={styles.underline} />
-        <p className={styles.subtitle}>// These are our sponsors</p>
       </header>
 
       <div className={styles.wrapper}>
@@ -32,6 +26,7 @@ export default function Sponsor() {
               style={{ "--i": i }}
             >
               <img src={s.img} alt={s.name} />
+              <span className={styles.sponsorName}>{s.name}</span>
             </div>
           ))}
         </div>

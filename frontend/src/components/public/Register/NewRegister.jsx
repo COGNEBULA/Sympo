@@ -377,6 +377,11 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!food) {
+      toast.warn("Please select a food preference");
+      return;
+    }
+
     const payload = buildRegistrationData();
 
     const formData = new FormData();
@@ -661,7 +666,7 @@ export default function RegisterPage() {
                     <div className={styles.formGroup}>
                         <label>Transaction UID</label>
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Enter UPI Transaction ID"
                             value={txnId}
                             onChange={(e) => setTxnId(e.target.value)}

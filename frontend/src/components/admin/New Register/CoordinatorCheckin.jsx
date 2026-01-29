@@ -22,7 +22,6 @@ const CoordinatorCheckin = () => {
     const fetchData = async () => {
       try {
         const res = await api.get('/get');
-        console.log("API Response:", res.data);
         
         if (res.data.success && res.data.registrationData?.registrationData) {
           const transformedData = res.data.registrationData.registrationData.map((participant) => ({
@@ -34,7 +33,7 @@ const CoordinatorCheckin = () => {
             mobile: participant.phone,
             email: participant.email,
             blacklist: participant.blacklist || false,
-            entered: false,
+            entered: participant.sent || false,
             checkedIn: participant.checkin || false,
             secondaryMail: participant.second_email || "",
             registrationId: participant.id,
@@ -228,7 +227,7 @@ const CoordinatorCheckin = () => {
               <th>MAIL</th>
               <th>SECONDARY MAIL</th>
               <th>CHECK IN</th>
-              {/* <th>ENTER</th> */}
+              <th>ENTER</th>
             </tr>
           </thead>
           <tbody>
@@ -262,7 +261,7 @@ const CoordinatorCheckin = () => {
                       type="text"
                       value={p.secondaryMail}
                       onChange={(e) => handleSecondaryMailChange(p.id, e.target.value)}
-                      disabled={isLocked || p.entered || p.secondaryMail}
+                      disabled={isLocked || p.entered}
                       className={styles.secondaryMailInput}
                     />
                   </td>
@@ -272,10 +271,10 @@ const CoordinatorCheckin = () => {
                       disabled={isLocked || p.entered || p.checkedIn}
                       onClick={() => handleCheckin(p.id)}
                     >
-                      Checkin
+                      Mail Checkin
                     </button>
                   </td>
-                  {/* <td>
+                  <td>
                     <button
                       className={styles.entryBtn}
                       disabled={isLocked || p.entered}
@@ -283,7 +282,7 @@ const CoordinatorCheckin = () => {
                     >
                       ✔
                     </button>
-                  </td> */}
+                  </td>
                 </tr>
               ))
             )}

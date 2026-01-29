@@ -5,7 +5,7 @@ import { Terminal, Zap, Code, Coffee, Users } from "lucide-react"
 const events = [
   {
     id: 1,
-    time: "TBA",
+    time: "8 am",
     title: "Check-in Time",
     description: "Registration & Welcome",
     icon: <Users className="w-5 h-5 text-purple-400" />,
@@ -13,7 +13,7 @@ const events = [
   },
   {
     id: 2,
-    time: "TBA",
+    time: "9 am",
     title: "Inauguration",
     description: "Grand Opening Ceremony",
     icon: <Zap className="w-5 h-5 text-purple-400" />,
@@ -21,7 +21,7 @@ const events = [
 },
 {
     id: 3,
-    time: "TBA",
+    time: "10 am",
     title: "Event Commencement",
     description: "Tech & Non-Tech Tracks",
     icon: <Zap className="w-5 h-5 text-purple-400" />,
@@ -33,7 +33,7 @@ const events = [
   },
   {
     id: 4,
-    time: "TBA",
+    time: "11 am",
     title: "Workshop",
     description: "Mind blowing AI Topics",
     icon: <Code className="w-5 h-5 text-purple-400" />,
@@ -41,7 +41,7 @@ const events = [
   },
   {
     id: 5,
-    time: "TBA",
+    time: "1 pm",
     title: "Lunch Break",
     description: "Networking & Refreshments",
     icon: <Coffee className="w-5 h-5 text-purple-400" />,
@@ -49,7 +49,7 @@ const events = [
   },
   {
     id: 6,
-    time: "TBA",
+    time: "4 pm",
     title: "Closing Ceremony",
     description: "Awards & Wrap-up",
     icon: <Zap className="w-5 h-5 text-purple-400" />,
