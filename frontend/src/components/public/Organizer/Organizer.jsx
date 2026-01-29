@@ -31,7 +31,7 @@ export default function Organizer() {
 
         <TreeNode
           title="Patron"
-          name="Dr. S. Sathish Kumar"
+          name="Dr. Satish Kumar S"
           role="Principal"
         />
 

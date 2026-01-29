@@ -16,6 +16,7 @@ import Eventlanding from "./components/public/Event/Eventlanding.jsx";
 import RegisterPage from "./components/public/Register/NewRegister.jsx";
 import EventTimeline from "./components/public/Timeline/eventTimeline.jsx";
 import CategoryPage from "./components/public/Event/CategoryPage";
+import Sponsor from "./components/public/Sponsor/Sponsor.jsx";
 
 // ==============================================================
 //                              Common
@@ -65,6 +66,7 @@ const App = () => {
                 <Event />
                 <EventTimeline />
                 <Highlight />
+                <Sponsor />
                 <Organizer />
                 <Contact />
                 <Footer />

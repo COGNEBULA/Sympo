@@ -54,35 +54,52 @@ const ParticipantsTeam = ({ participants, event }) => {
     }
   }, [certificatesSent]);
 
-  const handleButtonClick = async () => {
-    if (!isButtonEnabled || certificatesSent) return;
+  const allRegistrationIds = React.useMemo(() => {
+  return normalizedParticipants.flatMap(team =>
+    team.members.map(m => m.registration_id)
+  );
+}, [normalizedParticipants]);
 
-    if (!showCheckboxes) {
-      setShowCheckboxes(true);
-      setButtonText('Send');
-    } else {
-      const confirmSend = window.confirm(
-        `Send certificates to ${selectedIds.length} participants?`
-      );
 
-      if (confirmSend) {
-        await api.post('/certificates/coordinator', { registrationIds: selectedIds, eventName: event })
-        setCertificatesSent(true);
-        setButtonEnabled(false);
-        setShowCheckboxes(false);
-        setButtonText('Send Certificates');
+const handleButtonClick = async () => {
+  if (!isButtonEnabled || certificatesSent) return;
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Certificates sent',
-          text: `Sent to ${selectedIds.length} participant(s).`,
-          timer: 1800,
-          showConfirmButton: false
-        });
-          
-      }
-    }
-  };
+  // FIRST CLICK → show checkboxes & select all
+  if (!showCheckboxes) {
+    setShowCheckboxes(true);
+    setButtonText('Send');
+    setSelectedIds(allRegistrationIds); // ✅ SELECT ALL
+    return;
+  }
+
+  // SECOND CLICK → send certificates
+  const confirmSend = window.confirm(
+    `Send certificates to ${selectedIds.length} participants?`
+  );
+
+  if (!confirmSend) return;
+
+  await api.post('/certificates/coordinator', {
+    registrationIds: selectedIds,
+    eventName: event
+  });
+
+  setCertificatesSent(true);
+  setButtonEnabled(false);
+  setShowCheckboxes(false);
+  setButtonText('Send Certificates');
+  setSelectedIds([]);
+
+  Swal.fire({
+    icon: 'success',
+    title: 'Certificates sent',
+    text: `Sent to ${selectedIds.length} participant(s).`,
+    timer: 1800,
+    showConfirmButton: false
+  });
+};
+
+
 
   const handleNewParticipantSubmit = async () => {
     const {
