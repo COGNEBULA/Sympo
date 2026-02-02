@@ -28,7 +28,7 @@ export function Card({ contactGroups }) {
             <h3 className={styles.groupTitle}>{group.title}</h3>
           )}
 
-          <div className={styles.info}>
+          <div className={`${styles.info} ${group.style}`}>
             {group.members.map((person, i) => (
               <div key={i} className={styles.personBlock}>
                 <div
