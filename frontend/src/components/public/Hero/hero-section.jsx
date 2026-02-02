@@ -145,7 +145,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <div className="hidden lg:block absolute bottom-8 right-8 z-20 pointer-events-none">
+      {/* <div className="hidden lg:block absolute bottom-8 right-8 z-20 pointer-events-none">
         <div className="
           flex items-center gap-3
           px-5 py-3
@@ -162,10 +162,9 @@ export default function HeroSection() {
 
           <p className="text-sm text-[#E9DDFF]">
             <span className="font-semibold text-red-400 uppercase">No on-spot registration</span>
-            {/* <span className="opacity-70"> for Cognebula 2026</span> */}
           </p>
         </div>
-      </div>
+      </div> */}
       {/* Background effects */}
       <div className="absolute inset-0">
         {/* <div className="absolute inset-0 bg-gradient-to-br from-black via-[#301934] to-[#1a0a1f]" />
@@ -472,7 +471,7 @@ export default function HeroSection() {
         </a>
         
         {/* Mobile alert */}
-        <div className="lg:hidden w-full flex justify-center px-4 mt-4">
+        {/* <div className="lg:hidden w-full flex justify-center px-4 mt-4">
           <div className="
             flex items-center gap-3
             w-fit max-w-md
@@ -490,10 +489,9 @@ export default function HeroSection() {
 
             <p className="text-xs sm:text-sm text-[#E9DDFF] leading-snug">
               <span className="font-semibold text-red-400 uppercase">No on-spot registration</span>
-              {/* <span className="opacity-70"> for Cognebula 2026</span> */}
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
         
     </section>
