@@ -26,9 +26,9 @@ const contactGroups = [
       },
       {
         role: "Staff Co-ordinator",
-        name: "Dr. Rajesh Kumar",
-        phone: "9876543210",
-        email: "rajesh@vec.edu",
+        name: "Mrs. A.Prema",
+        phone: "9994428780",
+        email: "prema@vec.edu",
         big: true
       }
     ]
