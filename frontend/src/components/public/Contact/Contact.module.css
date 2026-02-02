@@ -339,13 +339,13 @@
     margin: 0;
   }
 
-  /* Mobile: Staff in 2 columns, 3rd item centered */
+  /* Mobile: Staff in 2 columns, 1st item centered */
   .grid > .center .info {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 
-  .grid > .center .info .personBlock:nth-child(3) {
+  .grid > .center .info .personBlock:nth-child(1) {
     grid-column: 1 / -1;
     justify-self: center;
     max-width: 50%;
