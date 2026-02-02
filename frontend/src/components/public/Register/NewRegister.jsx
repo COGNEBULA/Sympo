@@ -24,6 +24,7 @@ function EventGroupCard({
   teamData,
   setTeamName,
   gradient,
+  errors
 }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -94,8 +95,19 @@ function EventGroupCard({
                         type="text"
                         placeholder="Team Name"
                         value={teamData[event.event_name]?.teamName || ""}
-                        onChange={(e) => setTeamName(event.event_name, e.target.value, event.event_type)}
+                        onChange={(e) =>
+                          setTeamName(event.event_name, e.target.value, event.event_type)
+                        }
+                        className={
+                          errors[`team_${event.event_name}`] ? styles.inputError : ""
+                        }
                       />
+
+                      {errors[`team_${event.event_name}`] && (
+                        <span className={styles.errorText}>
+                          {errors[`team_${event.event_name}`]}
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}
@@ -194,9 +206,6 @@ export default function RegisterPage() {
     return amount
   }
 
-  console.log("team data", teamData);
-  
-
   const validate = () => {
     const err = {}
 
@@ -214,16 +223,16 @@ export default function RegisterPage() {
     if (!form.college.trim()) err.college = "College name is required"
     if (!form.year) err.year = "Select your year"
     
-    selectedEvents.map((event) => {
-      console.log("checking");
-    
-      const team = teamData[event.event_name]
-    
-      if (team && team.eventType === "team" && !team.teamName) {
-          toast.warn("Please Fill the team Name for team event");
-          err.teamName = "Team name is required for the selectedteam Events"
+    selectedEvents.forEach((event) => {
+      const team = teamData[event.event_name];
+
+      if (event.event_type === "team") {
+        if (!team || !team.teamName || !team.teamName.trim()) {
+          toast.warn(`Please enter team name for ${event.event_name}`);
+          err[`team_${event.event_name}`] = "Team name is required";
+        }
       }
-    })
+    });
       
     setErrors(err)
     const firstError = Object.values(err)[0]
@@ -309,6 +318,11 @@ export default function RegisterPage() {
 
   const setTeamName = (eventName, teamName, eventType) => {
     setTeamData((prev) => ({ ...prev, [eventName]: { ...(prev[eventName] || {}), teamName, eventType } }))
+    setErrors(prev => {
+      const copy = { ...prev };
+      delete copy[`team_${eventName}`];
+      return copy;
+    });
   }
 
   const yearMap = {
@@ -588,6 +602,7 @@ export default function RegisterPage() {
                     teamData={teamData}
                     setTeamName={setTeamName}
                     gradient={group.gradient}
+                    errors={errors}
                   />
                 ))}
               </div>

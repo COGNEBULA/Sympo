@@ -63,6 +63,18 @@
   z-index: 2;
 }
 
+/* Handle 3 staff members in one row */
+.grid > .center {
+  grid-column: 1 / -1; /* Span full width */
+}
+
+.grid > .center .info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
 /* card */
 .card {
   position: relative;
@@ -168,8 +180,6 @@
   position:relative;
   z-index:2;
   max-width:600px;
-  display: flex;
-  /* flex-direction: column; */
   gap: 5%;
   justify-content: center;
   width: 100%;
@@ -327,8 +337,20 @@
 
   .info {
     margin: 0;
-    text-align: center;
   }
+
+  /* Mobile: Staff in 2 columns, 3rd item centered */
+  .grid > .center .info {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .grid > .center .info .personBlock:nth-child(3) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 50%;
+  }
+    
 }
 
 @media (min-width: 1024px) and (max-width: 1366px) {

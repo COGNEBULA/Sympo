@@ -6,9 +6,9 @@ import { Card } from './Card';
 
 const contactGroups = [
   {
-    title: "",
-    img: panther,
-    side: "right",
+    title: "Staff Co-ordinators",
+    side: "center",
+    style: "grid grid-cols-2 gap-4 sm:gap-6 md:flex md:flex-row md:justify-center md:gap-x-12",
     members: [
       {
         role: "Staff Co-ordinator",
@@ -16,19 +16,19 @@ const contactGroups = [
         phone: "9841170770",
         email: "priya@vec.edu",
         big: true
-      }
-    ]
-  },
-  {
-    title: "",
-    img: alien,
-    side: "left",
-    members: [
+      },
       {
         role: "Staff Co-ordinator",
         name: "Mrs. S. Mythili",
         phone: "9626901493",
         email: "mythili@vec.edu",
+        big: true
+      },
+      {
+        role: "Staff Co-ordinator",
+        name: "Dr. Rajesh Kumar",
+        phone: "9876543210",
+        email: "rajesh@vec.edu",
         big: true
       }
     ]
@@ -37,6 +37,7 @@ const contactGroups = [
     title: "President & Vice President",
     img: alien,
     side: "left",
+    style: "flex md:justify-center md:gap-x-8",
     members: [
       {
         role: "President",
@@ -56,6 +57,7 @@ const contactGroups = [
     title: "Secretary & Joint Secretary",
     img: panther,
     side: "right",
+    style: "flex md:justify-center md:gap-x-8",
     members: [
       {
         role: "Secretary",

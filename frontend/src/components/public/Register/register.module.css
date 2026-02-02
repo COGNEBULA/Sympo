@@ -1132,3 +1132,13 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+.errorText {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.inputError {
+  border: 1px solid #ef4444;
+}

@@ -6,7 +6,9 @@ const sponsors = [
   { name: "Atlanwa", img: "/images/Sponsors/atlanva.png" },
   { name: "Coat Park", img: "/images/Sponsors/coatpark.png" },
   { name: "JD Dog Robot", img: "/images/Sponsors/dogrobot.webp" },
-  { name: "Square Brothers", img: "/images/Sponsors/squarebrothers.png" }
+  { name: "Square Brothers", img: "/images/Sponsors/squarebrothers.png" },
+  { name: "Imarticus Learnimg", img: "/images/Sponsors/IL.jpeg" },
+  { name: "Sk events & catering", img: "/images/Sponsors/sk.jpeg" },
 ];
 
 export default function Sponsor() {
