@@ -14,7 +14,7 @@ const contactGroups = [
         role: "Staff Co-ordinator",
         name: "Mrs. Priya M",
         phone: "9841170770",
-        email: "priya@velammal.edu.in",
+        email: "priya.m@velammal.edu.in",
         big: true
       },
       {
