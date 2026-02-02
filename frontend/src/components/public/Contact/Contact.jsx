@@ -14,21 +14,21 @@ const contactGroups = [
         role: "Staff Co-ordinator",
         name: "Mrs. Priya M",
         phone: "9841170770",
-        email: "priya@vec.edu",
+        email: "priya.m@velammal.edu.in",
         big: true
       },
       {
         role: "Staff Co-ordinator",
         name: "Mrs. S. Mythili",
         phone: "9626901493",
-        email: "mythili@vec.edu",
+        email: "mythili@velammal.edu.in",
         big: true
       },
       {
         role: "Staff Co-ordinator",
-        name: "Dr. Rajesh Kumar",
-        phone: "9876543210",
-        email: "rajesh@vec.edu",
+        name: "Mrs. A.Prema",
+        phone: "9994428780",
+        email: "prema@velammal.edu.in",
         big: true
       }
     ]
