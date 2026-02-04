@@ -121,6 +121,7 @@
 .floatingLogo:nth-child(6) { top: 82%; left: 85%; }
 .floatingLogo:nth-child(7) { top: 12%; left: 80%; }
 .floatingLogo:nth-child(8) { top: 80%; left: 15%; }
+.floatingLogo:nth-child(9) { top: 15%; left: 60%; }
 
 /* logo glass chip */
 .floatingLogo img {
@@ -289,10 +290,12 @@
   .bubbleContainer {
     width: 100%;
     max-width: 340px;
-    height: 500px;
+    height: 900px;
     margin: 0 auto;
     margin-top: 0;
   }
+
+.floatingLogo:nth-child(9) { top: 15%; left: 30%; }
 
   /* Reduce logo size */
   .floatingLogo img {

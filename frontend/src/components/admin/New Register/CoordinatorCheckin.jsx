@@ -14,8 +14,6 @@ const CoordinatorCheckin = () => {
   const [totalRegistration, setTotalRegistration] = useState(0);
   const [totalCheckedIn, setTotalCheckedIn] = useState(0);
 
-  const [confirmEnterId, setConfirmEnterId] = useState(null);
-
   const [isLocked, setIsLocked] = useState(true);
 
   useEffect(() => {
@@ -33,9 +31,11 @@ const CoordinatorCheckin = () => {
             mobile: participant.phone,
             email: participant.email,
             blacklist: participant.blacklist || false,
-            entered: participant.sent || false,
+            entered: participant.checkin || false,
             checkedIn: participant.checkin || false,
             secondaryMail: participant.second_email || "",
+            secondaryMailLocked: !!(participant.second_email && participant.second_email.trim() !== ''),
+            mailCheckedIn: false,
             registrationId: participant.id,
             teamname: participant.teamname
           }));
@@ -83,69 +83,109 @@ const CoordinatorCheckin = () => {
     const registrationId = participant?.registrationId;
     const secondaryMail = participant?.secondaryMail;
 
-    setParticipants(prev =>
-      prev.map(p =>
-        p.id === id ? { ...p, checkedIn: true } : p
-      )
-    );
+    const confirmResult = await Swal.fire({
+      icon: 'question',
+      title: 'Confirm Mail Check-in',
+      text: `Send check-in email${secondaryMail ? ' to secondary mail' : ''} for ${participant?.name}?`,
+      showCancelButton: true,
+      confirmButtonText: 'Yes, send',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#6366f1'
+    });
+
+    if (!confirmResult.isConfirmed) {
+      return;
+    }
 
     try {
-      if (!secondaryMail || secondaryMail.trim() === '') {
-        // No secondary mail, just checkin
-        await api.post('/checkin/coordinator', { registration_id: registrationId });
-      } else {
-        // Has secondary mail, update it first then checkin
+      if (secondaryMail && secondaryMail.trim() !== '') {
+        // Send secondary email if available
         await api.post('/second_email/coordinator', { 
           registration_id: registrationId,
           second_email: secondaryMail 
         });
       }
 
+      // Mark mail check-in locally
+      setParticipants(prev =>
+        prev.map(p =>
+          p.id === id ? { ...p, mailCheckedIn: true } : p
+        )
+      );
+
       // Show success alert
       await Swal.fire({
         icon: 'success',
-        title: 'Check-in Successful!',
-        text: `${participant?.name} has been checked in.`,
+        title: 'Email Sent!',
+        text: secondaryMail ? `Secondary email sent to ${participant?.name}` : 'Marked for check-in',
         confirmButtonColor: '#22c55e',
         timer: 2000,
         showConfirmButton: false
       });
 
     } catch (error) {
-      console.error("Error during checkin:", error);
-      
-      // Revert the state if the API call fails
-      setParticipants(prev =>
-        prev.map(p =>
-          p.id === id ? { ...p, checkedIn: false } : p
-        )
-      );
+      console.error("Error sending secondary email:", error);
 
       // Show error alert
       await Swal.fire({
         icon: 'error',
-        title: 'Check-in Failed!',
-        text: error.response?.data?.message || 'An error occurred during check-in. Please try again.',
+        title: 'Failed!',
+        text: error.response?.data?.message || 'An error occurred. Please try again.',
         confirmButtonColor: '#ef4444'
       });
     }
   };
 
-  const handleEnterConfirm = () => {
-    setParticipants(prev =>
-      prev.map(p =>
-        p.id === confirmEnterId ? { ...p, entered: true } : p
-      )
-    );
+  const handleEnterConfirm = async (id) => {
+    const participant = participants.find(p => p.id === id);
+    const registrationId = participant?.registrationId;
 
-    const registrationId = participants.find(p => p.id === confirmEnterId)?.registrationId;
-    fetch("http://localhost:5000/api/mark_entered", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ participantId: registrationId })
+    const confirmResult = await Swal.fire({
+      icon: 'question',
+      title: 'Confirm Entry',
+      text: `Mark ${participant?.name} as entered?`,
+      showCancelButton: true,
+      confirmButtonText: 'Yes, confirm',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#22c55e'
     });
 
-    setConfirmEnterId(null);
+    if (!confirmResult.isConfirmed) {
+      return;
+    }
+
+    try {
+      // Call checkin endpoint
+      await api.post('/checkin/coordinator', { registration_id: registrationId });
+
+      // Mark as entered and checked-in locally
+      setParticipants(prev =>
+        prev.map(p =>
+          p.id === id ? { ...p, entered: true, checkedIn: true } : p
+        )
+      );
+
+      // Show success alert
+      await Swal.fire({
+        icon: 'success',
+        title: 'Entry Confirmed!',
+        text: `${participant?.name} has been marked as entered.`,
+        confirmButtonColor: '#22c55e',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
+    } catch (error) {
+      console.error("Error during entry confirmation:", error);
+
+      // Show error alert
+      await Swal.fire({
+        icon: 'error',
+        title: 'Entry Failed!',
+        text: error.response?.data?.message || 'An error occurred. Please try again.',
+        confirmButtonColor: '#ef4444'
+      });
+    }
   };
 
   const handleSecondaryMailChange = (id, value) => {
@@ -261,14 +301,14 @@ const CoordinatorCheckin = () => {
                       type="text"
                       value={p.secondaryMail}
                       onChange={(e) => handleSecondaryMailChange(p.id, e.target.value)}
-                      disabled={isLocked || p.entered}
+                      disabled={isLocked || p.entered || p.secondaryMailLocked}
                       className={styles.secondaryMailInput}
                     />
                   </td>
                   <td>
                     <button
                       className={styles.checkinBtn}
-                      disabled={isLocked || p.entered || p.checkedIn}
+                      disabled={isLocked || p.entered || p.checkedIn || p.mailCheckedIn}
                       onClick={() => handleCheckin(p.id)}
                     >
                       Mail Checkin
@@ -278,7 +318,7 @@ const CoordinatorCheckin = () => {
                     <button
                       className={styles.entryBtn}
                       disabled={isLocked || p.entered}
-                      onClick={() => setConfirmEnterId(p.id)}
+                      onClick={() => handleEnterConfirm(p.id)}
                     >
                       ✔
                     </button>
@@ -291,16 +331,6 @@ const CoordinatorCheckin = () => {
       </div>
 
 
-      {/* 🔥 MODAL */}
-      {confirmEnterId && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalCard}>
-            <p>Mark participant {confirmEnterId} as entered?</p>
-            <button onClick={handleEnterConfirm}>OK</button>
-            <button onClick={() => setConfirmEnterId(null)}>Cancel</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

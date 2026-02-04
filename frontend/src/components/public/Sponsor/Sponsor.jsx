@@ -5,10 +5,13 @@ import styles from "./sponsor.module.css";
 const sponsors = [
   { name: "Atlanwa", img: "/images/Sponsors/atlanva.png" },
   { name: "Coat Park", img: "/images/Sponsors/coatpark.png" },
-  { name: "JD Dog Robot", img: "/images/Sponsors/dogrobot.webp" },
+  { name: "JD Robot Dog", img: "/images/Sponsors/dogrobot.webp" },
   { name: "Square Brothers", img: "/images/Sponsors/squarebrothers.png" },
   { name: "Imarticus Learnimg", img: "/images/Sponsors/IL.jpeg" },
   { name: "Sk events & catering", img: "/images/Sponsors/sk.jpeg" },
+  { name: "SSI Computer Education", img: "/images/Sponsors/ssi.png" },
+  { name: "Heliostrom", img: "/images/Sponsors/heliostrom.png" },
+  { name: "KHEM Study Abord Agency", img: "/images/Sponsors/khem.jpeg" },
 ];
 
 export default function Sponsor() {

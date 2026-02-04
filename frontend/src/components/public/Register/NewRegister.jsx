@@ -21,6 +21,7 @@ function EventGroupCard({
   toggleEvent,
   isFull,
   isHurryUp,
+  isOnSpotOnly,
   teamData,
   setTeamName,
   gradient,
@@ -44,11 +45,12 @@ function EventGroupCard({
             const selected = selectedEvents.some((s) => s.event_name === event.event_name)
             const hurryUp = isHurryUp(event)
             const full = isFull(event)
+            const onSpotOnly = isOnSpotOnly(event)
 
             return (
               <div
                 key={event.event_name}
-                className={`${styles.eventCard} ${selected ? styles.selected : ""} ${full ? styles.disabled : ""}`}
+                className={`${styles.eventCard} ${selected ? styles.selected : ""} ${full || onSpotOnly ? styles.disabled : ""}`}
               >
                 <div className={styles.eventHeader}>
                   <div className={styles.eventTitle}>
@@ -56,31 +58,50 @@ function EventGroupCard({
                       type="checkbox"
                       checked={selected}
                       onChange={() => toggleEvent(event)}
-                      disabled={full}
+                      disabled={full || onSpotOnly}
                       id={`evt-${event.event_name}`}
                       className={styles.checkbox}
                     />
                     <label htmlFor={`evt-${event.event_name}`}>
                       <span className={styles.eventName}>{event.event_name}</span>
                     </label>
-                    <span
-                      className={`${styles.sessionBadge} ${
-                        event.isBoth ? styles.multiSession : styles.singleSession
-                      }`}
-                    >
-                      {event.isBoth ? "Double Sessions" : "Single Session"}
-                    </span>
+                    {!onSpotOnly && !full && (
+                      <span
+                        className={`${styles.sessionBadge} ${
+                          event.isBoth ? styles.multiSession : styles.singleSession
+                        }`}
+                      >
+                        {event.isBoth ? "Double Sessions" : "Single Session"}
+                      </span>
+                    )}
                   </div>
 
                   <div className={styles.badges}>
                     {full && <span className={styles.fullBadge}>Slot Full</span>}
-                    {hurryUp && !full && (
+                    {onSpotOnly && !full && (
+                      <span className={styles.hurryBadge} style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}>
+                        <Clock size={12} /> On-Spot Only
+                      </span>
+                    )}
+                    {hurryUp && !full && !onSpotOnly && (
                       <span className={styles.hurryBadge}>
                         <Clock size={12} /> {event.message}
                       </span>
                     )}
                   </div>
                 </div>
+
+                {onSpotOnly && (
+                  <div className="text-orange-400 text-sm mt-2 p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                    <strong>Note:</strong> Online registration is closed. Unregistered teammates can register on the event by contacting at{" "}
+                    <a
+                      href="tel:+919876543210"
+                      className="font-semibold underline hover:text-orange-300"
+                    >
+                      +91 98765 43210
+                    </a>.
+                  </div>
+                )}
 
                 <div className={styles.eventMeta}>
                   {event.event_mode === "workshop" && (
@@ -244,6 +265,8 @@ export default function RegisterPage() {
   const isHurryUp = (event) => event.status === "HURRY_UP";
 
   const isFull = (event) => event.status === "FULL" || event.remainingSlots === 0
+  
+  const isOnSpotOnly = (event) => !event.isAvailable
 
   const canSelectEvent = (event) => {
     const selected = selectedEvents;
@@ -593,12 +616,13 @@ export default function RegisterPage() {
                     key={group.mode}
                     title={group.title}
                     events={events.filter(e => 
-                      e.event_mode === group.mode && e.isAvailable
+                      e.event_mode === group.mode
                     )}
                     selectedEvents={selectedEvents}
                     toggleEvent={toggleEvent}
                     isFull={isFull}
                     isHurryUp={isHurryUp}
+                    isOnSpotOnly={isOnSpotOnly}
                     teamData={teamData}
                     setTeamName={setTeamName}
                     gradient={group.gradient}
