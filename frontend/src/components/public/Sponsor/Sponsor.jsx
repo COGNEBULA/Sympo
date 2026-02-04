@@ -12,6 +12,8 @@ const sponsors = [
   { name: "SSI Computer Education", img: "/images/Sponsors/ssi.png" },
   { name: "Heliostrom", img: "/images/Sponsors/heliostrom.png" },
   { name: "KHEM Study Abord Agency", img: "/images/Sponsors/khem.jpeg" },
+  { name: "Chennai mobiles", img: "/images/Sponsors/cm.jpg" },
+  { name: "Poorvika", img: "/images/Sponsors/poorvika.png" },
 ];
 
 export default function Sponsor() {
