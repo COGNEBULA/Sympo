@@ -122,6 +122,8 @@
 .floatingLogo:nth-child(7) { top: 12%; left: 80%; }
 .floatingLogo:nth-child(8) { top: 80%; left: 15%; }
 .floatingLogo:nth-child(9) { top: 15%; left: 60%; }
+.floatingLogo:nth-child(10) { top: 25%; left: 0%; }
+.floatingLogo:nth-child(11) { top: 50%; left: 40%; }
 
 /* logo glass chip */
 .floatingLogo img {
@@ -295,8 +297,7 @@
     margin-top: 0;
   }
 
-.floatingLogo:nth-child(9) { top: 15%; left: 30%; }
-
+  
   /* Reduce logo size */
   .floatingLogo img {
     width: 112px;
@@ -312,7 +313,8 @@
   .floatingLogo:nth-child(5) { top: 62%; left: 18%; }
   .floatingLogo:nth-child(6) { top: 65%; left: 62%; }
   .floatingLogo:nth-child(7) { top: 80%; left: 40%; }
-  .floatingLogo:nth-child(8) { display: none; } /* optional for clarity */
+  .floatingLogo:nth-child(8) { top: 80%; left: 0%; }
+  .floatingLogo:nth-child(9) { top: 15%; left: 30%; }
 
   /* Disable hover scaling on touch */
   .floatingLogo:hover img {
