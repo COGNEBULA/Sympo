@@ -93,12 +93,19 @@ function EventGroupCard({
 
                 {onSpotOnly && (
                   <div className="text-orange-400 text-sm mt-2 p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                    <strong>Note:</strong> Online registration is closed. Unregistered teammates can register on the event by contacting at{" "}
+                    <strong>Note:</strong> Online registration is closed due to slot limits. Unregistered teammates can complete their registration by contacting this number 
                     <a
-                      href="tel:+919876543210"
+                      href="tel:+919094917427"
                       className="font-semibold underline hover:text-orange-300"
                     >
-                      +91 98765 43210
+                      +91 9094917427
+                    </a>
+                    {" "} or {" "}
+                    <a
+                      href="tel:+918754126405"
+                      className="font-semibold underline hover:text-orange-300"
+                    >
+                      +91 8754126405
                     </a>.
                   </div>
                 )}

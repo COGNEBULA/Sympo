@@ -52,20 +52,19 @@
       "id": "TECH02",
       "title": "Paper Podium",
       "sympoImg": "/images/paperpodium.jpeg",
-      "description": "A two-round AI-based paper presentation event where teams propose innovative, end-to-end technical solutions to real-world societal problems, focusing on practicality, impact, and business relevance.",
+      "description": "An AI paper presentation event focused on practical, impactful solutions to real-world societal problems.",
       "highlights": [
-        "Two-level presentation format",
+        "Single-round presentation format",
         "AI-driven societal problem solving",
         "Business and feasibility-focused evaluation",
-        "Prototype or demo video required"
+        "Prototype or demo video (optional)"
       ],
       "rules": [
         "Team of 2–4 members.",
-        "Level 1 – 10 min presentation | Level 2 – 7 min presentation + 5 min Q&A.",
-        "Laptop, two separate PPTs, and prototype or demo video (30–60 sec) for Level 2.",
-        "Offline/on-stage presentation using PPT with live or video prototype demo.",
-        "Level 1 – Technical design, AI integration & architecture <br/> Level 2 – Real-world application, business value & limitations.",
-        "Evaluation is based on innovation, AI relevance, technical clarity, feasibility, business impact, and presentation.",
+        "Duration: Total - 15 mins; Presentation - 8 mins; Business Pitching - 2 mins; Demo video (optional) - 1 min; Q&A Session - 5 mins.",
+        "Laptop and one PPT required. A 30–60 sec prototype/demo video is an added advantage.",
+        "Offline/on-stage presentation using PPT with optional live or video prototype demo.",
+        "Judging based on innovation, AI relevance, technical clarity, feasibility, real-world impact, and presentation.",
         "Plagiarism, false claims, or rule violations will lead to immediate disqualification."
       ],
       "teamlimit": "2–4 members",
