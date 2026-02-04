@@ -102,7 +102,7 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": false,
-      "isAvailable": false
+      "isAvailable": true
     },
     {
       "event_name": "Paper Podium",
