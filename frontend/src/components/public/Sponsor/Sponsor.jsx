@@ -14,6 +14,7 @@ const sponsors = [
   { name: "KHEM Study Abord Agency", img: "/images/Sponsors/khem.jpeg" },
   { name: "Chennai mobiles", img: "/images/Sponsors/cm.jpg" },
   { name: "Poorvika", img: "/images/Sponsors/poorvika.png" },
+  { name: "Mould Networks", img: "/images/Sponsors/MN.jpg" },
 ];
 
 export default function Sponsor() {
