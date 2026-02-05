@@ -145,7 +145,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* <div className="hidden lg:block absolute bottom-8 right-8 z-20 pointer-events-none">
+      { <div className="hidden lg:block absolute bottom-8 right-8 z-20 pointer-events-none">
         <div className="
           flex items-center gap-3
           px-5 py-3
@@ -164,7 +164,7 @@ export default function HeroSection() {
             <span className="font-semibold text-red-400 uppercase">No on-spot registration</span>
           </p>
         </div>
-      </div> */}
+      </div> }
       {/* Background effects */}
       <div className="absolute inset-0">
         {/* <div className="absolute inset-0 bg-gradient-to-br from-black via-[#301934] to-[#1a0a1f]" />
@@ -471,7 +471,7 @@ export default function HeroSection() {
         </a>
         
         {/* Mobile alert */}
-        {/* <div className="lg:hidden w-full flex justify-center px-4 mt-4">
+        { <div className="lg:hidden w-full flex justify-center px-4 mt-4">
           <div className="
             flex items-center gap-3
             w-fit max-w-md
@@ -491,7 +491,7 @@ export default function HeroSection() {
               <span className="font-semibold text-red-400 uppercase">No on-spot registration</span>
             </p>
           </div>
-        </div> */}
+        </div> }
       </div>
         
     </section>
