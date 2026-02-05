@@ -124,6 +124,7 @@
 .floatingLogo:nth-child(9) { top: 15%; left: 60%; }
 .floatingLogo:nth-child(10) { top: 25%; left: 0%; }
 .floatingLogo:nth-child(11) { top: 50%; left: 40%; }
+.floatingLogo:nth-child(12) { top: 90%; left: 0%; }
 
 /* logo glass chip */
 .floatingLogo img {
@@ -316,6 +317,7 @@
   .floatingLogo:nth-child(8) { top: 80%; left: 0%; }
   .floatingLogo:nth-child(9) { top: 15%; left: 30%; }
   .floatingLogo:nth-child(12) { top: 55%; left: 0%; }
+  .floatingLogo:nth-child(13) { top: 90%; left: 0%; }
 
   /* Disable hover scaling on touch */
   .floatingLogo:hover img {
