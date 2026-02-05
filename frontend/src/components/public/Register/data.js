@@ -12,7 +12,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": true,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Janavi Shreya R", "phone": "9486570245" },
+        { "name": "Sri Hari M", "phone": "7358286069" }
+      ]
     },
     {
       "event_name": "Auction Arena",
@@ -27,7 +31,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": false,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Surendran C", "phone": "6383891788" },
+        { "name": "Mohammed Rafik B", "phone": "7010436546" }
+      ]
     },
     {
       "event_name": "Battle of Thrones",
@@ -42,7 +50,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": false,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Thamizharasan D", "phone": "8220634939" },
+        { "name": "Srinivasan S", "phone": "7418331403" }
+      ]
     },
     {
       "event_name": "Beyond the Gate",
@@ -57,7 +69,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": true,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Nithusha Shree T", "phone": "9790844988" },
+        { "name": "Haripriya M.S.", "phone": "9042488559" }
+      ]
     },
     {
       "event_name": "Cinefrenzy",
@@ -72,7 +88,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": true,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Nithishkumar V", "phone": "7010278033" },
+        { "name": "Elakiya C", "phone": "9884084540" }
+      ]
     },
     {
       "event_name": "Flashback",
@@ -87,7 +107,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": true,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Ashwatha R", "phone": "7200019769" },
+        { "name": "Chithra B", "phone": "9962254450" }
+      ]
     },
     {
       "event_name": "HackQuest",
@@ -102,7 +126,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": false,
-      "isAvailable": false
+      "isAvailable": false,
+      "coordinators": [
+        { "name": "Pranesh Kumar V", "phone": "8754126405" },
+        { "name": "Jayanthi Shree S", "phone": "9094917427" }
+      ]
     },
     {
       "event_name": "Paper Podium",
@@ -117,7 +145,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": false,
-      "isAvailable": false
+      "isAvailable": false,
+      "coordinators": [
+        { "name": "Arjun V L", "phone": "9360107132" },
+        { "name": "Roshan Varghese Cherian", "phone": "8939084766" }
+      ]
     },
     {
       "event_name": "Prompt Craft",
@@ -132,7 +164,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": true,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Sai Vignesh Raj M", "phone": "8838860329" },
+        { "name": "Archana D", "phone": "6381951337" }
+      ]
     },
     {
       "event_name": "Query Clash",
@@ -147,7 +183,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": true,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Waatson J", "phone": "8667273132" },
+        { "name": "Sriraam V H", "phone": "7358594362" }
+      ]
     },
     {
       "event_name": "Rhythmia",
@@ -162,7 +202,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": true,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Rinthiya S", "phone": "8148886621" },
+        { "name": "Nivedhitha R S", "phone": "9342628294" }
+      ]
     },
     {
       "event_name": "Shark Tank",
@@ -177,7 +221,11 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": false,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Gladson T", "phone": "8072811313" },
+        { "name": "Siva R", "phone": "6374804052" }
+      ]
     },
     {
       "event_name": "Workshop",
@@ -192,6 +240,10 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": false,
-      "isAvailable": true
+      "isAvailable": true,
+      "coordinators": [
+        { "name": "Srishti", "phone": "8838279086" },
+        { "name": "Yuvashree", "phone": "8056215651" }
+      ]
     }
   ]
