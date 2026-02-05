@@ -78,11 +78,11 @@ function EventGroupCard({
 
                   <div className={styles.badges}>
                     {full && <span className={styles.fullBadge}>Slot Full</span>}
-                    {onSpotOnly && !full && (
+                    {/* {onSpotOnly && !full && (
                       <span className={styles.hurryBadge} style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}>
-                        <Clock size={12} /> On-Spot Only
+                      <Clock size={12} /> No On-Spot
                       </span>
-                    )}
+                    )} */}
                     {hurryUp && !full && !onSpotOnly && (
                       <span className={styles.hurryBadge}>
                         <Clock size={12} /> {event.message}
@@ -464,7 +464,7 @@ export default function RegisterPage() {
   return (
     <>
       <div className={styles.container} style={{ background: "transparent" }}>
-        {/* <div className="hidden lg:block absolute top-8 right-4 z-20 pointer-events-none">
+        { <div className="hidden lg:block absolute top-8 right-4 z-20 pointer-events-none">
           <div className="
             flex items-center gap-3
             px-5 py-3
@@ -483,14 +483,14 @@ export default function RegisterPage() {
               <span className="font-semibold text-red-400 uppercase">No on-spot registration</span>
             </p>
           </div>
-        </div> */}
+        </div> }
         <div className={styles.header}>
           <div className="flex justify-between">
             <button className={styles.backBtn} onClick={() => navigate(-1)}>
               <ArrowLeft size={20} />
               Back
             </button>
-            {/* <div className="lg:hidden block top-8 right-4 z-20 pointer-events-none">
+            { <div className="lg:hidden block top-8 right-4 z-20 pointer-events-none">
               <div className="
                 flex items-center gap-3
                 px-5 py-3
@@ -509,7 +509,7 @@ export default function RegisterPage() {
                   <span className="font-semibold text-red-400 uppercase">No on-spot registration</span>
                 </p>
               </div>
-            </div> */}
+            </div> }
           </div>
           <div className={styles.headerContent}>
             <h1>Event Registration</h1>
