@@ -78,11 +78,11 @@ function EventGroupCard({
 
                   <div className={styles.badges}>
                     {full && <span className={styles.fullBadge}>Slot Full</span>}
-                    {onSpotOnly && !full && (
+                    {/* {onSpotOnly && !full && (
                       <span className={styles.hurryBadge} style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}>
-                        <Clock size={12} /> On-Spot Only
+                      <Clock size={12} /> No On-Spot
                       </span>
-                    )}
+                    )} */}
                     {hurryUp && !full && !onSpotOnly && (
                       <span className={styles.hurryBadge}>
                         <Clock size={12} /> {event.message}
