@@ -15,6 +15,7 @@ const sponsors = [
   { name: "Chennai mobiles", img: "/images/Sponsors/cm.jpg" },
   { name: "Poorvika", img: "/images/Sponsors/poorvika.png" },
   { name: "Mould Networks", img: "/images/Sponsors/MN.jpg" },
+  { name: "Darshan Construction", img: "/images/Sponsors/DARSHAN.jpeg" },
 ];
 
 export default function Sponsor() {
