@@ -117,7 +117,7 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": false,
-      "isAvailable": true
+      "isAvailable": false
     },
     {
       "event_name": "Prompt Craft",
