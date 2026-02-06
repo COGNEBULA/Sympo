@@ -28,9 +28,11 @@ async function getAdminAnalytics(date) {
     `);
 
     const topColleges = await client.query(`
-      SELECT college, COUNT(*)::INT AS count
+      SELECT
+        INITCAP(TRIM(LOWER(college))) AS college,
+        COUNT(*)::INT AS count
       FROM registrations
-      GROUP BY college
+      GROUP BY INITCAP(TRIM(LOWER(college)))
       ORDER BY count DESC
       LIMIT 5
     `);
