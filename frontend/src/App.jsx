@@ -32,6 +32,7 @@ import RoleLogin from "./components/auth/Login/Login.jsx";
 import EventContainer from "./components/admin/Containers/EventContainer.jsx";
 import GeneralContainer from "./components/admin/Containers/GeneralContainer.jsx";
 import CoordinatorCheckin from "./components/admin/New Register/CoordinatorCheckin.jsx";
+import RegistrationClosed from "./components/public/Register/RegisterClose.jsx";
 
 
 const App = () => { 
@@ -83,6 +84,10 @@ const App = () => {
           />
           <Route
             path="/register"
+            element={<RegistrationClosed />}
+          />
+          <Route
+            path="/register/new"
             element={<RegisterPage />}
           />
           <Route

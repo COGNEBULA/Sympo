@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./CoordinatorCheckin.module.css";
+import { useNavigate } from "react-router-dom";
 import api from "../../../api/axios";
 import Swal from "sweetalert2";
 
@@ -8,6 +9,7 @@ const symposiumDate = new Date("2026-01-07T00:00:00");
 const CoordinatorCheckin = () => {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterMode, setFilterMode] = useState("overall"); // overall | blacklist
@@ -246,7 +248,7 @@ const CoordinatorCheckin = () => {
             Total Checked In: {totalCheckedIn}
           </div>
 
-          <button className={styles.newBtn} disabled={isLocked}>
+          <button className={styles.newBtn} disabled={isLocked} onClick={() => navigate("/register/new")}>
             New Registration
           </button>
         </div>

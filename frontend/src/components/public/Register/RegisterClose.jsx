@@ -1,4 +1,4 @@
-import { Lock } from "lucide-react";
+import { Home, Lock } from "lucide-react";
 import styles from "./register.module.css";
 
 export default function RegistrationClosed() {
@@ -12,6 +12,10 @@ export default function RegistrationClosed() {
           <br />
           We look forward to seeing you at the event!
         </p>
+
+        <a href="/" className={styles.homeBtn}>
+          <Home size={16} color="#000" className="mt-2"/> Go Home
+        </a>
       </div>
     </div>
   );

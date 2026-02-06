@@ -1142,3 +1142,30 @@ input[type="number"] {
 .inputError {
   border: 1px solid #ef4444;
 }
+
+.homeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 12px 22px;
+  border-radius: 14px;
+  text-decoration: none;
+
+  background: linear-gradient(135deg, #cea2fd, #8968cd);
+  color: #1a0a1f;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+
+  box-shadow: 0 0 30px rgba(206, 162, 253, 0.6);
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.homeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px rgba(206, 162, 253, 0.85);
+}
