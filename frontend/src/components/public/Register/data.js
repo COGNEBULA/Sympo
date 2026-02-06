@@ -164,10 +164,9 @@ export const sympoEvents = [
       "status": "AVAILABLE",
       "message": "Slots available",
       "isBoth": true,
-      "isAvailable": true,
+      "isAvailable": false,
       "coordinators": [
-        { "name": "Sai Vignesh Raj M", "phone": "8838860329" },
-        { "name": "Archana D", "phone": "6381951337" }
+        { "name": "Yasir", "phone": "8754126405" }
       ]
     },
     {
