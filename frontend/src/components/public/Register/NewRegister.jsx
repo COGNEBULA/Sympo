@@ -80,7 +80,7 @@ function EventGroupCard({
                     {full && <span className={styles.fullBadge}>Slot Full</span>}
                     {/* {onSpotOnly && !full && (
                       <span className={styles.hurryBadge} style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}>
-                      <Clock size={12} /> No On-Spot
+                      <Clock size={12} /> No On-Spot only
                       </span>
                     )} */}
                     {hurryUp && !full && !onSpotOnly && (
